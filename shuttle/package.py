@@ -4,12 +4,12 @@ from hashlib import sha256
 from glob import glob
 import shutil
 
-from shuttle import util
-from shuttle import validation
-from shuttle import default
-from shuttle.manifest import Manifest
-from shuttle.archive import NewArchive
-from shuttle.base import Base
+from . import util
+from . import validation
+from . import default
+from .manifest import Manifest
+from .archive import NewArchive
+from .base import Base
 
 
 class Package(Manifest):  # installed package

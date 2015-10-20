@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from shuttle import util
+from . import util
 
 
 class Base(object):

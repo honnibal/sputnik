@@ -1,4 +1,4 @@
-from shuttle.base import Base
+from .base import Base
 
 
 class Manifest(Base):

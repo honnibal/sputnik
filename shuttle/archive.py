@@ -4,9 +4,9 @@ import time
 import tarfile
 import shutil
 
-from shuttle import util
-from shuttle import default
-from shuttle.manifest import Manifest
+from . import util
+from . import default
+from .manifest import Manifest
 
 
 class NewArchive(Manifest):  # package archive

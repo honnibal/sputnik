@@ -1,10 +1,10 @@
 import os
 
-from shuttle import validation
-from shuttle import default
-from shuttle import util
-from shuttle.archive import Archive
-from shuttle.package import Package, PackageRecipe
+from . import validation
+from . import default
+from . import util
+from .archive import Archive
+from .package import Package, PackageRecipe
 
 
 class Command(object):

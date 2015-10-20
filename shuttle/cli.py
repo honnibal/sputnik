@@ -1,8 +1,8 @@
 import argparse
 
-from shuttle import command
-from shuttle import validation
-from shuttle import default
+from . import command
+from . import validation
+from . import default
 
 
 def data_path_type(path):
