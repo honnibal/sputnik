@@ -1,0 +1,11 @@
+{
+  "name": "test",
+  "description": "test package",
+  "model": "test",
+  "dependencies": [],
+  "include": ["data/*"],
+  "languages": ["en"],
+  "version": "1.0.0",
+  "license": "public domain",
+  "compatibility": {}
+}
