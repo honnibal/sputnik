@@ -38,7 +38,7 @@ class ArchiveReader(object):
 
                 self.archive.seek(noffset)
 
-                checksum = hashlib.sha256()
+                checksum = getattr(hashlib, entry['checksum'][0])()
 
                 with gzip.GzipFile(fileobj=self.archive) as gz:
 
@@ -62,7 +62,8 @@ class ArchiveReader(object):
                                 cb(bytes_read)
 
                 # checksums from bytes read and meta data should match
-                assert checksum.hexdigest() == entry['checksum']
+                if checksum.hexdigest() != entry['checksum'][1]:
+                    raise Exception('checksum mismatch: %s' % path)
 
             noffset = entry['noffset']
 

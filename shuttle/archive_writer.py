@@ -1,17 +1,21 @@
 import gzip
 import io
 import os
-import hashlib
 import json
 import tarfile
 import time
 import tempfile
+import hashlib
 
 from .archive_defaults import *
 
 
 class ArchiveWriter(object):
-    def __init__(self, path, base_path=None):
+    def __init__(self, path, base_path=None, hash_func=hashlib.sha256):
+        if not hash_func or hash_func().name not in hashlib.algorithms_available:
+            raise Exception('invalid hash_func')
+
+        self.hash_func = hash_func
         self.base_path = base_path
         self.path = path
         self.meta = []
@@ -77,7 +81,7 @@ class ArchiveWriter(object):
         if self.base_path is None and os.path.isabs(path):
             raise Exception('cannot handle absolute paths without base_path: %s' % path)
 
-        checksum = hashlib.sha256()
+        checksum = self.hash_func()
 
         with gzip.GzipFile(fileobj=self.archive,
                            compresslevel=COMPRESSLEVEL) as gz:
@@ -104,7 +108,7 @@ class ArchiveWriter(object):
             'path': os.path.relpath(path, self.base_path or ''),
             'noffset': self.archive.tell(),
             'size': os.stat(path).st_size,
-            'checksum': checksum.hexdigest(),
+            'checksum': (checksum.name, checksum.hexdigest()),
         })
 
     def add_path(self, path, cb=None):
