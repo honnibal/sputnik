@@ -1,3 +1,4 @@
+import sys
 import argparse
 
 from . import command
@@ -99,8 +100,9 @@ def get_parser():
     return parser
 
 
-def run(args):
+def run(parser):
+    args = parser.parse_args(sys.argv[1:])
     if hasattr(args, 'run'):
         args.run(args)
     else:
-        args.print_usage()
+        parser.print_usage()
