@@ -69,6 +69,5 @@ class PackageRecipe(Base):  # package.json recipe
             print("build", archive.filename)
             for include in self.include:
                 for path in glob(include):
-                    with io.open(path, "rb") as f:
-                        archive.add_file(path, f)
+                    archive.add_file(path)
             return archive

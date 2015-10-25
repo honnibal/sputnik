@@ -7,6 +7,8 @@ import shutil
 from . import util
 from . import default
 from .manifest import Manifest
+from .archive_writer import ArchiveWriter
+from .archive_reader import ArchiveReader
 
 
 class NewArchive(Manifest):  # package archive
@@ -21,52 +23,29 @@ class NewArchive(Manifest):  # package archive
 
     def __enter__(self):
         archive_path = os.path.join(self.path, self.filename)
-        self.archive = tarfile.open(archive_path, "w:gz")
+        self.archive = ArchiveWriter(archive_path)
         return self
 
     def __exit__(self, type, value, traceback):
-        self.size = sum([x for _, _, x in self.files.values()])
-        self.add_bytes(default.meta_manifest_path, self.to_json().encode('ascii'))
+        self.add_bytes('package.json', self.to_json().encode('utf8'))
         self.archive.close()
 
-    def add_file_base(self, info, f):
-        info.type = tarfile.REGTYPE
-        info.mode = 0o644
-        info.uid = info.gid = 1000
-        self.archive.addfile(info, f)
-
-    def add_file(self, path, f):
+    def add_file(self, path):
         if not os.path.isfile(path):
             raise Exception("only files")
         
-        stat = os.fstat(f.fileno())
-
-        with io.open(path, "rb") as x:
-            m = self.hash_func()
-            m.update(x.read())
-            self.files[path] = (
-                m.name,  # file path
-                m.hexdigest(),  # checksum
-                stat.st_size)  # file size
-
-        info = tarfile.TarInfo(path)
-        info.size = stat.st_size
-        info.mtime = stat.st_mtime
-        self.add_file_base(info, f)
+        self.archive.add(path)
 
     def add_bytes(self, path, byte_string):
-        f = io.BytesIO(byte_string)
-        info = tarfile.TarInfo(path)
-        info.size = len(byte_string)
-        info.mtime = time.time()
-        self.add_file_base(info, f)
+        self.archive.add_bytes(path, byte_string)
 
 
 class Archive(Manifest):
     def __init__(self, path):
         self.path = path
-        with tarfile.open(path, "r:gz") as archive:
-            defaults = util.archive_json(archive, default.meta_manifest_path)
+        self.archive = ArchiveReader(path)
+
+        defaults = self.archive.get_index_json('package.json')
 
         Manifest.__init__(self, defaults)
 
@@ -87,19 +66,18 @@ class Archive(Manifest):
     def install(self, data_path):
         archive_name = util.archive_filename(self.name, self.version)
         dest_dir = os.path.join(data_path, archive_name)
-    
+
         self.cleanup(dest_dir)
     
         tmp_install_dir = dest_dir + ".install"
         tmp_remove_dir = dest_dir + ".remove"
     
-        if not util.is_enough_space(data_path, self.size):
+        if not util.is_enough_space(data_path, self.archive.size()):
             raise Exception("not enough space")
     
         # tmp install
-        with tarfile.open(self.path, "r:gz") as archive:
-            print("pending install", tmp_install_dir)
-            archive.extractall(tmp_install_dir)
+        print("pending install", tmp_install_dir)
+        self.archive.extract_all(tmp_install_dir)
     
         # make way
         if os.path.exists(dest_dir):

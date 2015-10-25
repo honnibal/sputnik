@@ -1,6 +1,7 @@
 import shutil
 import json
 import io
+import os
 
 
 def is_enough_space(path, size):
@@ -32,3 +33,9 @@ def json_dump(obj):
 def json_load(path):
     with io.open(path, "rb") as f:
         return json.loads(f.read().decode('ascii'))
+
+
+def makedirs(path):
+    path = os.path.dirname(path)
+    if path and not os.path.exists(path):
+        os.makedirs(path)
