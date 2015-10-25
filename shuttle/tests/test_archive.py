@@ -47,7 +47,9 @@ def test_create_and_read(tmp_path, sample_package_path):
 def test_create_and_checksum(tmp_path, sample_package_path):
     archive_path = os.path.join(tmp_path, 'test.shuttle')
 
-    with ArchiveWriter(archive_path, base_path=sample_package_path) as f:
+    with ArchiveWriter(archive_path,
+                       base_path=sample_package_path,
+                       hash_func=hashlib.md5) as f:
         f.add_path(sample_package_path)
 
     assert os.path.exists(archive_path)
@@ -55,7 +57,8 @@ def test_create_and_checksum(tmp_path, sample_package_path):
     with ArchiveReader(archive_path) as archive:
         for entry in archive.meta:
             with io.open(os.path.join(sample_package_path, entry['path'])) as f:
-                assert entry['checksum'] == hashlib.sha256(f.read()).hexdigest()
+                assert entry['checksum'][0] == hashlib.md5().name
+                assert entry['checksum'][1] == hashlib.md5(f.read()).hexdigest()
 
 
 def test_create_and_extract(tmp_path, tmp_path2, sample_package_path):
