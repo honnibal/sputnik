@@ -27,7 +27,7 @@ class NewArchive(Manifest):  # package archive
         return self
 
     def __exit__(self, type, value, traceback):
-        self.add_bytes('package.json', self.to_json().encode('utf8'))
+        self.add_json('package', self.to_dict())
         self.archive.close()
 
     def add_file(self, path):
@@ -36,8 +36,8 @@ class NewArchive(Manifest):  # package archive
         
         self.archive.add(path)
 
-    def add_bytes(self, path, byte_string):
-        self.archive.add_bytes(path, byte_string)
+    def add_json(self, name, obj):
+        self.archive.add_json(name, obj)
 
 
 class Archive(Manifest):
@@ -45,7 +45,7 @@ class Archive(Manifest):
         self.path = path
         self.archive = ArchiveReader(path)
 
-        defaults = self.archive.get_index_json('package.json')
+        defaults = self.archive.get_member('package')
 
         Manifest.__init__(self, defaults)
 

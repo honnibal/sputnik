@@ -7,6 +7,7 @@ import time
 import tempfile
 import hashlib
 
+from . import util
 from .archive_defaults import *
 
 
@@ -18,11 +19,10 @@ class ArchiveWriter(object):
         self.hash_func = hash_func
         self.base_path = base_path
         self.path = path
-        self.meta = []
         self.tmp_path = tempfile.mkdtemp()
         self.tmp_archive_path = os.path.join(self.tmp_path, ARCHIVE_FILENAME)
         self.archive = io.open(self.tmp_archive_path, 'wb')
-        self.index_data = {}
+        self.meta = {}
 
     def __del__(self):
         self.archive.close()
@@ -36,8 +36,6 @@ class ArchiveWriter(object):
         self.close()
 
     def close(self):
-        defaults = {'indent': 4, 'separators': (',', ': ')}
-        meta_json = json.dumps(self.meta, **defaults)
         mtime = time.time()
 
         with tarfile.open(self.path, 'w') as tar:
@@ -49,18 +47,9 @@ class ArchiveWriter(object):
                 info.mode = 0o644
                 info.uid = info.gid = 1000
                 tar.addfile(info, f)
+                self.meta['archive'] = ARCHIVE_FILENAME
 
-            for filename, data in self.index_data.items():
-                with io.BytesIO(data) as f:
-                    info = tarfile.TarInfo(filename)
-                    info.size = len(data)
-                    info.mtime = mtime
-                    info.type = tarfile.REGTYPE
-                    info.mode = 0o644
-                    info.uid = info.gid = 1000
-                    tar.addfile(info, f)
-
-            data = meta_json.encode(JSON_ENCODING)
+            data = util.json_dump(self.meta)
             with io.BytesIO(data) as f:
                 info = tarfile.TarInfo(META_FILENAME)
                 info.size = len(data)
@@ -70,12 +59,8 @@ class ArchiveWriter(object):
                 info.uid = info.gid = 1000
                 tar.addfile(info, f)
 
-    def add_index(self, path):
-        self.add_bytes(path, io.open(path).read().encode('utf8'))
-
-    def add_bytes(self, path, byte_string):
-        path = os.path.relpath(path, self.base_path or '')
-        self.index_data[path] = byte_string
+    def add_json(self, name, obj):
+        self.meta[name] = obj
 
     def add(self, path, cb=None):
         if self.base_path is None and os.path.isabs(path):
@@ -104,7 +89,8 @@ class ArchiveWriter(object):
 
             gz.flush()
 
-        self.meta.append({
+        self.meta['manifest'] = self.meta.get('manifest', [])
+        self.meta['manifest'].append({
             'path': os.path.relpath(path, self.base_path or ''),
             'noffset': self.archive.tell(),
             'size': os.stat(path).st_size,

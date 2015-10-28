@@ -16,8 +16,8 @@ class ArchiveReader(object):
         self.archive = None
         self.tar = tarfile.open(self.path, 'r')
 
-        self.archive = self.tar.extractfile(ARCHIVE_FILENAME)
-        self.meta = self.get_index_json(META_FILENAME)
+        self.meta = self.get_meta()
+        self.archive = self.tar.extractfile(self.meta['archive'])
 
     def __enter__(self):
         return self
@@ -31,7 +31,7 @@ class ArchiveReader(object):
 
     def extract(self, member, extract_path, cb=None):
         noffset = 0
-        for entry in self.meta:
+        for entry in self.meta['manifest']:
             if entry['path'] == member:
                 path = entry['path']
                 size = entry['size']
@@ -68,19 +68,22 @@ class ArchiveReader(object):
             noffset = entry['noffset']
 
     def extract_all(self, extract_path, cb=None):
-        for entry in self.meta:
+        for entry in self.meta['manifest']:
             self.extract(entry['path'], extract_path, cb=cb)
 
         members = [m.name for m in self.index_members()]
         for member in members:
             self.tar.extract(member, extract_path)
 
-    def get_index_json(self, member):
-        reader = codecs.getreader(JSON_ENCODING)
-        return json.load(reader(self.tar.extractfile(member)))
+    def get_meta(self):
+        reader = codecs.getreader('utf8')
+        return json.load(reader(self.tar.extractfile(META_FILENAME)))
+
+    def get_member(self, member):
+        return self.meta[member]
 
     def list(self):
-        return [e['path'] for e in self.meta]
+        return [e['path'] for e in self.meta['manifest']]
 
     def size_compressed(self):
         return self.meta[-1]['noffset']
@@ -90,5 +93,5 @@ class ArchiveReader(object):
 
     def size(self):
         indices = [m.size for m in self.index_members()]
-        files = [m['size'] for m in self.meta]
+        files = [m['size'] for m in self.meta['manifest']]
         return sum(indices) + sum(files)

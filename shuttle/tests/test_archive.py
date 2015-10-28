@@ -55,8 +55,8 @@ def test_create_and_checksum(tmp_path, sample_package_path):
     assert os.path.exists(archive_path)
 
     with ArchiveReader(archive_path) as archive:
-        for entry in archive.meta:
-            with io.open(os.path.join(sample_package_path, entry['path'])) as f:
+        for entry in archive.meta['manifest']:
+            with io.open(os.path.join(sample_package_path, entry['path']), 'rb') as f:
                 assert entry['checksum'][0] == hashlib.md5().name
                 assert entry['checksum'][1] == hashlib.md5(f.read()).hexdigest()
 
@@ -80,22 +80,21 @@ def test_create_and_extract(tmp_path, tmp_path2, sample_package_path):
 
             assert os.stat(package_path).st_size == os.stat(extract_path).st_size
 
-            assert hashlib.sha256(io.open(package_path).read()).hexdigest() == \
-                   hashlib.sha256(io.open(extract_path).read()).hexdigest()
+            assert hashlib.sha256(io.open(package_path, 'rb').read()).hexdigest() == \
+                   hashlib.sha256(io.open(extract_path, 'rb').read()).hexdigest()
 
 
 def test_create_with_index(tmp_path, sample_package_path):
     archive_path = os.path.join(tmp_path, 'test.shuttle')
 
     with ArchiveWriter(archive_path, base_path=sample_package_path) as f:
-        f.add_index(os.path.join(sample_package_path, 'package.json'))
         f.add_path(os.path.join(sample_package_path, 'data'))
 
     assert os.path.exists(archive_path)
 
     tar = tarfile.open(archive_path, 'r')
 
-    assert set(tar.getnames()) == set([ARCHIVE_FILENAME, META_FILENAME, 'package.json'])
+    assert set(tar.getnames()) == set([ARCHIVE_FILENAME, META_FILENAME])
 
     with ArchiveReader(archive_path) as f:
         content = path_content(os.path.join(sample_package_path, 'data'),
@@ -109,14 +108,13 @@ def test_create_without_base_path(tmp_path, sample_package_path):
     os.chdir(sample_package_path)
 
     with ArchiveWriter(archive_path) as f:
-        f.add_index('package.json')
         f.add_path('data')
 
     assert os.path.exists(archive_path)
 
     tar = tarfile.open(archive_path, 'r')
 
-    assert set(tar.getnames()) == set([ARCHIVE_FILENAME, META_FILENAME, 'package.json'])
+    assert set(tar.getnames()) == set([ARCHIVE_FILENAME, META_FILENAME])
 
     with ArchiveReader(archive_path) as f:
         content = path_content(os.path.join(sample_package_path, 'data'),

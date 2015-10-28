@@ -5,6 +5,8 @@ import tempfile
 
 import pytest
 
+from .. import util
+
 
 @pytest.fixture
 def tmp_path():
@@ -19,8 +21,9 @@ def tmp_path2():
 @pytest.fixture(scope='module')
 def sample_package_path():
     path = tempfile.mkdtemp()
+
     with io.open(os.path.join(path, 'package.json'), 'wb') as f:
-        json.dump({
+        f.write(util.json_dump({
             "name": "test",
             "description": "test package",
             "model": "test",
@@ -30,13 +33,13 @@ def sample_package_path():
             "version": "1.0.0",
             "license": "public domain",
             "compatibility": {}
-        }, f)
+        }))
     data_path = os.path.join(path, 'data')
     os.mkdir(data_path)
-    with io.open(os.path.join(data_path, 'model1'), 'wb') as f:
+    with io.open(os.path.join(data_path, 'model1'), 'w') as f:
         for i in range(1):
             f.write(str(i) * 1024)
-    with io.open(os.path.join(data_path, 'model2'), 'wb') as f:
+    with io.open(os.path.join(data_path, 'model2'), 'w') as f:
         for i in range(1):
             f.write(str(i) * 1024)
     return path
