@@ -5,6 +5,7 @@ from . import default
 from . import util
 from .archive import Archive
 from .package import Package, PackageRecipe
+from .index import Index
 
 
 class Command(object):
@@ -13,8 +14,8 @@ class Command(object):
             raise Exception("%r must be a directory" % data_path)
         self.data_path = data_path
 
-    def install(self, package_name, repository=default.install_repository):
-        archive_path = os.path.join(repository, package_name)
+    def install(self, package_name, repository_url=default.install_repository_url):
+        archive_path = os.path.join(repository_url, package_name)
         archive = Archive(archive_path)
         return archive.install(self.data_path)
 
@@ -31,3 +32,11 @@ class Command(object):
         packages = Package.find(package_string, self.data_path)
         keys = not meta and ('name', 'version') or ()
         print(util.json_dump([p.to_dict(keys) for p in packages]))
+
+    def upload(self, package_path, repository_url=default.upload_repository_url):
+        index = Index(self.data_path, repository_url)
+        index.upload(package_path)
+
+    def update(self, repository_url=default.update_repository_url):
+        index = Index(self.data_path, repository_url)
+        index.update()

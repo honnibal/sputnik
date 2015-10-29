@@ -16,5 +16,8 @@ class Manifest(Base):
         self.license = defaults.get('license')
         self.compatibility = defaults.get('compatibility')
 
+    def package_name(self):
+        return '%s-%s' % (self.name, self.version)
+
     def is_valid(self):
         pass

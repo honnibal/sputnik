@@ -39,14 +39,14 @@ def add_install_parser(subparsers):
         help='install package from repository')
     parser.add_argument('package',
         help='package name')
-    parser.add_argument('repository',
-        default=default.install_repository,
+    parser.add_argument('repository_url',
+        default=default.install_repository_url,
         nargs='?',
         help='repository url')
 
     def run(args):
         c = command.Command(args.data_path)
-        c.install(args.package)
+        c.install(args.package, args.repository_url)
 
     parser.set_defaults(run=run)
 
@@ -83,6 +83,40 @@ def add_list_parser(subparsers):
     parser.set_defaults(run=run)
 
 
+def add_upload_parser(subparsers):
+    parser = subparsers.add_parser('upload',
+        help='upload package')
+    parser.add_argument('package_path',
+        help='package path')
+    parser.add_argument('repository_url',
+        default=default.upload_repository_url,
+        nargs='?',
+        help='repository url')
+
+    def run(args):
+        c = command.Command(args.data_path)
+        c.upload(
+            package_path=args.package_path,
+            repository_url=args.repository_url)
+
+    parser.set_defaults(run=run)
+
+
+def add_update_parser(subparsers):
+    parser = subparsers.add_parser('update',
+        help='update package cache')
+    parser.add_argument('repository_url',
+        default=default.update_repository_url,
+        nargs='?',
+        help='repository url')
+
+    def run(args):
+        c = command.Command(args.data_path)
+        c.update(repository_url=args.repository_url)
+
+    parser.set_defaults(run=run)
+
+
 def get_parser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
@@ -96,6 +130,8 @@ def get_parser():
     add_install_parser(subparsers)
     add_remove_parser(subparsers)
     add_list_parser(subparsers)
+    add_upload_parser(subparsers)
+    add_update_parser(subparsers)
 
     return parser
 

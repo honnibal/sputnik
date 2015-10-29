@@ -63,6 +63,12 @@ class Archive(Manifest):
             print("install", tmp_install_dir)
             os.rename(tmp_install_dir, data_path)
 
+    def fileobjs(self):
+        return {
+            '%s/meta.json' % self.package_name(): io.BytesIO(util.json_dump(self.archive.meta)),
+            '%s/archive.gz' % self.package_name(): self.archive.archive,
+        }
+
     def install(self, data_path):
         archive_name = util.archive_filename(self.name, self.version)
         dest_dir = os.path.join(data_path, archive_name)
