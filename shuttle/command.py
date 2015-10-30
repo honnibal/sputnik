@@ -15,8 +15,12 @@ class Command(object):
         self.data_path = data_path
 
     def install(self, package_name, repository_url=default.install_repository_url):
-        archive_path = os.path.join(repository_url, package_name)
-        archive = Archive(archive_path)
+        if os.path.exists(package_name):
+            archive = Archive(package_name)
+        else:
+            index = Index(self.data_path, repository_url)
+            index.update()
+            archive = index.cache(package_name)
         return archive.install(self.data_path)
 
     def build(self, package_path=default.build_package_path):
@@ -31,7 +35,7 @@ class Command(object):
     def list(self, package_string=default.list_package_string, meta=default.list_meta):
         packages = Package.find(package_string, self.data_path)
         keys = not meta and ('name', 'version') or ()
-        print(util.json_dump([p.to_dict(keys) for p in packages]))
+        util.json_print([p.to_dict(keys) for p in packages])
 
     def upload(self, package_path, repository_url=default.upload_repository_url):
         index = Index(self.data_path, repository_url)

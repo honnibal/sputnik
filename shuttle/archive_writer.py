@@ -8,7 +8,7 @@ import tempfile
 import hashlib
 
 from . import util
-from .archive_defaults import *
+from . import default
 
 
 class ArchiveWriter(object):
@@ -20,7 +20,7 @@ class ArchiveWriter(object):
         self.base_path = base_path
         self.path = path
         self.tmp_path = tempfile.mkdtemp()
-        self.tmp_archive_path = os.path.join(self.tmp_path, ARCHIVE_FILENAME)
+        self.tmp_archive_path = os.path.join(self.tmp_path, default.ARCHIVE_FILENAME)
         self.archive = io.open(self.tmp_archive_path, 'wb')
         self.meta = {}
 
@@ -40,18 +40,21 @@ class ArchiveWriter(object):
 
         with tarfile.open(self.path, 'w') as tar:
             with io.open(self.tmp_archive_path, 'rb') as f:
-                info = tarfile.TarInfo(ARCHIVE_FILENAME)
+                checksum = hashlib.md5(f.read()).hexdigest()
+                f.seek(os.SEEK_SET, 0)
+
+                info = tarfile.TarInfo(default.ARCHIVE_FILENAME)
                 info.size = os.stat(self.tmp_archive_path).st_size
                 info.mtime = os.stat(self.tmp_archive_path).st_mtime
                 info.type = tarfile.REGTYPE
                 info.mode = 0o644
                 info.uid = info.gid = 1000
                 tar.addfile(info, f)
-                self.meta['archive'] = ARCHIVE_FILENAME
+                self.meta['archive'] = (default.ARCHIVE_FILENAME, checksum)
 
             data = util.json_dump(self.meta)
             with io.BytesIO(data) as f:
-                info = tarfile.TarInfo(META_FILENAME)
+                info = tarfile.TarInfo(default.META_FILENAME)
                 info.size = len(data)
                 info.mtime = mtime
                 info.type = tarfile.REGTYPE
@@ -69,12 +72,12 @@ class ArchiveWriter(object):
         checksum = self.hash_func()
 
         with gzip.GzipFile(fileobj=self.archive,
-                           compresslevel=COMPRESSLEVEL) as gz:
+                           compresslevel=default.COMPRESSLEVEL) as gz:
             with io.open(path, 'rb') as f:
                 bytes_read = 0
 
                 while True:
-                    chunk = f.read(CHUNK_SIZE)
+                    chunk = f.read(default.CHUNK_SIZE)
                     if not chunk:
                         break
 

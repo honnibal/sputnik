@@ -5,8 +5,9 @@ import hashlib
 import json
 import tarfile
 import codecs
+import shutil
 
-from .archive_defaults import *
+from . import default
 from . import util
 
 
@@ -14,10 +15,16 @@ class ArchiveReader(object):
     def __init__(self, path):
         self.path = path
         self.archive = None
-        self.tar = tarfile.open(self.path, 'r')
 
-        self.meta = self.get_meta()
-        self.archive = self.tar.extractfile(self.meta['archive'])
+        if os.path.isdir(path):
+            self.tar = None
+            self.meta = util.json_load(os.path.join(path, default.META_FILENAME))
+            self.archive = io.open(self.meta['archive'][0], 'rb')
+
+        else:  # expect tar
+            self.tar = tarfile.open(self.path, 'r')
+            self.meta = self.get_meta()
+            self.archive = self.tar.extractfile(self.meta['archive'][0])
 
     def __enter__(self):
         return self
@@ -48,7 +55,7 @@ class ArchiveReader(object):
 
                         bytes_read = 0
                         while True:
-                            chunk = gz.read(min(size - bytes_read, CHUNK_SIZE))
+                            chunk = gz.read(min(size - bytes_read, default.CHUNK_SIZE))
                             if not chunk:
                                 break
 
@@ -71,13 +78,16 @@ class ArchiveReader(object):
         for entry in self.meta['manifest']:
             self.extract(entry['path'], extract_path, cb=cb)
 
-        members = [m.name for m in self.index_members()]
+        members = [m['name'] for m in self.index_members()]
         for member in members:
-            self.tar.extract(member, extract_path)
+            if self.tar:
+                self.tar.extract(member, extract_path)
+            else:
+                shutil.copy(os.path.join(self.path, member), extract_path)
 
     def get_meta(self):
         reader = codecs.getreader('utf8')
-        return json.load(reader(self.tar.extractfile(META_FILENAME)))
+        return json.load(reader(self.tar.extractfile(default.META_FILENAME)))
 
     def get_member(self, member):
         return self.meta[member]
@@ -89,9 +99,18 @@ class ArchiveReader(object):
         return self.meta[-1]['noffset']
 
     def index_members(self):
-        return [m for m in self.tar.getmembers() if m.name != ARCHIVE_FILENAME]
+        if self.tar:
+            return [{
+                'size': m.size,
+                'name': m.name,
+            } for m in self.tar.getmembers() if m.name != default.ARCHIVE_FILENAME]
+        else:
+            return [{
+                'size': os.stat(m).st_size,
+                'name': m,
+            } for m in os.listdir(self.path) if m != default.ARCHIVE_FILENAME]
 
     def size(self):
-        indices = [m.size for m in self.index_members()]
+        indices = [m['size'] for m in self.index_members()]
         files = [m['size'] for m in self.meta['manifest']]
         return sum(indices) + sum(files)

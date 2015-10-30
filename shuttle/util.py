@@ -28,7 +28,18 @@ def json_load(path):
         return json.loads(f.read().decode('utf8'))
 
 
+def json_print(obj):
+    defaults = {'sort_keys': True, 'indent': 2, 'separators': (',', ': ')}
+    print(json.dumps(obj, **defaults))
+
+
 def makedirs(path):
     path = os.path.dirname(path)
     if path and not os.path.exists(path):
         os.makedirs(path)
+
+
+def unquote(s):
+    if (s[0] == s[-1]) and s.startswith(("'", '"')):
+        return s[1:-1]
+    return s

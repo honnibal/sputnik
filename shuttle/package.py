@@ -16,7 +16,7 @@ class Package(Manifest):  # installed package
     def __init__(self, path):
         self.path = path
         defaults = util.json_load(os.path.join(path,
-            default.meta_manifest_path))
+            default.META_FILENAME))['package']
 
         Manifest.__init__(self, defaults)
 

@@ -7,7 +7,7 @@ import pytest
 
 from ..archive_writer import ArchiveWriter
 from ..archive_reader import ArchiveReader
-from ..archive_defaults import *
+from ..default import *
 
 
 def path_content(path, base_path=None):
