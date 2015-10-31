@@ -7,11 +7,17 @@ import tarfile
 import hashlib
 import sys
 try:
+    from http.cookiejar import MozillaCookieJar
+except ImportError:
+    from cookielib import MozillaCookieJar
+try:
     from urllib.parse import urlparse, urljoin
-    from urllib.request import urlopen, Request
+    from urllib.request import Request, build_opener, HTTPRedirectHandler, HTTPCookieProcessor
     from urllib.error import HTTPError
 except ImportError:
-    from urllib2 import urlopen, urlparse, Request, HTTPError
+    from urlparse import urlparse, urljoin
+    from urllib2 import Request, build_opener, HTTPRedirectHandler, HTTPCookieProcessor
+    from urllib2 import HTTPError
 try:
     from http.client import HTTPConnection
 except ImportError:
@@ -68,8 +74,18 @@ class Index(object):
         #         if ext == '.' + default.meta_extension:
         #             cached[name] = (etag, filename + ext)
 
+        cookie_jar = MozillaCookieJar(os.path.join(self.data_path, default.COOKIES_FILENAME))
+        try:
+            cookie_jar.load()
+        except Exception:
+            pass
+
+        opener = build_opener(
+            HTTPRedirectHandler(),
+            HTTPCookieProcessor(cookie_jar))
+
         reader = codecs.getreader('utf8')
-        index = json.load(reader(urlopen(self.repository_url)))
+        index = json.load(reader(opener.open(self.repository_url)))
 
         meta = {}
         urls = {}
@@ -95,7 +111,7 @@ class Index(object):
             path = os.path.join(self.data_path, '.' + name, filename)
             util.makedirs(path)
 
-            meta[name] = json.load(reader(urlopen(urls[name])))
+            meta[name] = json.load(reader(opener.open(urls[name])))
 
             with io.open(path, 'wb') as f:
                 f.write(util.json_dump(meta[name]))
@@ -115,7 +131,7 @@ class Index(object):
 
         util.makedirs(path)
         # TODO etag header is not md5 for multipart uploads
-        uget.download(url, path, console=sys.stdout,
+        uget.download(self.data_path, url, path, console=sys.stdout,
             checksum=hashlib.md5(), checksum_header='etag')
 
         return Archive(os.path.dirname(path))
