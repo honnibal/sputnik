@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import io
 import codecs
@@ -53,7 +54,7 @@ class Index(object):
         conn =  HTTPConnection('%s:%d' % (o.netloc, o.port or 80))
         conn.request('PUT', '/reindex')
         response = conn.getresponse()
-        print('reindex', response.code == 200)
+        print('reindex', response.status == 200)
 
     def is_package(self, name):
         return name in self.meta

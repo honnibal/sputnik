@@ -15,7 +15,7 @@ class Command(object):
         self.data_path = data_path
 
     def install(self, package_name, repository_url=default.install_repository_url):
-        if os.path.exists(package_name):
+        if os.path.isfile(package_name):
             archive = Archive(package_name)
         else:
             index = Index(self.data_path, repository_url)

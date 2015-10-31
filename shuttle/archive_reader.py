@@ -19,7 +19,7 @@ class ArchiveReader(object):
         if os.path.isdir(path):
             self.tar = None
             self.meta = util.json_load(os.path.join(path, default.META_FILENAME))
-            self.archive = io.open(self.meta['archive'][0], 'rb')
+            self.archive = io.open(os.path.join(path, self.meta['archive'][0]), 'rb')
 
         else:  # expect tar
             self.tar = tarfile.open(self.path, 'r')
@@ -106,7 +106,7 @@ class ArchiveReader(object):
             } for m in self.tar.getmembers() if m.name != default.ARCHIVE_FILENAME]
         else:
             return [{
-                'size': os.stat(m).st_size,
+                'size': os.stat(os.path.join(self.path, m)).st_size,
                 'name': m,
             } for m in os.listdir(self.path) if m != default.ARCHIVE_FILENAME]
 
