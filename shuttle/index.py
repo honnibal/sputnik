@@ -1,32 +1,20 @@
 from __future__ import print_function
 import os
 import io
-import codecs
 import json
 import tarfile
 import hashlib
 import sys
 try:
-    from http.cookiejar import MozillaCookieJar
+    from urllib.parse import urljoin
 except ImportError:
-    from cookielib import MozillaCookieJar
-try:
-    from urllib.parse import urlparse, urljoin
-    from urllib.request import Request, build_opener, HTTPRedirectHandler, HTTPCookieProcessor
-    from urllib.error import HTTPError
-except ImportError:
-    from urlparse import urlparse, urljoin
-    from urllib2 import Request, build_opener, HTTPRedirectHandler, HTTPCookieProcessor
-    from urllib2 import HTTPError
-try:
-    from http.client import HTTPConnection
-except ImportError:
-    from httplib import HTTPConnection
+    from urlparse import urljoin
 
 from . import default
 from . import util
 from . import uget
 from .archive import Archive
+from .session import Session, GetRequest, PutRequest
 
 from boto.s3.connection import S3Connection
 
@@ -56,10 +44,9 @@ class Index(object):
             key = bucket.new_key(key_name)
             key.set_contents_from_file(f)
 
-        o = urlparse(self.repository_url)
-        conn =  HTTPConnection('%s:%d' % (o.netloc, o.port or 80))
-        conn.request('PUT', '/reindex')
-        response = conn.getresponse()
+        request = PutRequest(urljoin(self.repository_url, '/reindex'))
+        session = Session(self.data_path)
+        response = session.open(request)
         print('reindex', response.status == 200)
 
     def is_package(self, name):
@@ -74,18 +61,10 @@ class Index(object):
         #         if ext == '.' + default.meta_extension:
         #             cached[name] = (etag, filename + ext)
 
-        cookie_jar = MozillaCookieJar(os.path.join(self.data_path, default.COOKIES_FILENAME))
-        try:
-            cookie_jar.load()
-        except Exception:
-            pass
 
-        opener = build_opener(
-            HTTPRedirectHandler(),
-            HTTPCookieProcessor(cookie_jar))
-
-        reader = codecs.getreader('utf8')
-        index = json.load(reader(opener.open(self.repository_url)))
+        request = GetRequest(self.repository_url)
+        session = Session(self.data_path)
+        index = json.load(session.open(request, 'utf8'))
 
         meta = {}
         urls = {}
@@ -111,7 +90,8 @@ class Index(object):
             path = os.path.join(self.data_path, '.' + name, filename)
             util.makedirs(path)
 
-            meta[name] = json.load(reader(opener.open(urls[name])))
+            request = GetRequest(urls[name])
+            meta[name] = json.load(session.open(request, 'utf8'))
 
             with io.open(path, 'wb') as f:
                 f.write(util.json_dump(meta[name]))

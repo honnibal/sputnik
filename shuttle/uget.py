@@ -4,18 +4,13 @@ import io
 import math
 import re
 try:
-    from http.cookiejar import MozillaCookieJar
-except ImportError:
-    from cookielib import MozillaCookieJar
-try:
-    from urllib.request import Request, build_opener, HTTPRedirectHandler, HTTPCookieProcessor
     from urllib.error import HTTPError
 except ImportError:
-    from urllib2 import Request, build_opener, HTTPRedirectHandler, HTTPCookieProcessor
     from urllib2 import HTTPError
 
 from . import util
 from . import default
+from .session import Session, GetRequest, HeadRequest
 
 
 class UnknownContentLengthException(Exception): pass
@@ -100,22 +95,17 @@ def get_content_length(response):
     return int(response.headers.get('Content-Length').strip())
 
 
-def get_url_meta(opener, url, checksum_header=None):
-    class HeadRequest(Request):
-        def get_method(self):
-            return "HEAD"
-
-    request = HeadRequest(url)
-    r = opener.open(request)
-    res = {'size': get_content_length(r)}
+def get_url_meta(session, url, checksum_header=None):
+    response = session.open(HeadRequest(url))
+    meta = {'size': get_content_length(response)}
 
     if checksum_header:
-        value = r.headers.get(checksum_header)
+        value = response.headers.get(checksum_header)
         if value:
-            res['checksum'] = value
+            meta['checksum'] = value
 
-    r.close()
-    return res
+    response.close()
+    return meta
 
 
 def progress(console, bytes_read, total_size, transfer_rate, eta):
@@ -130,15 +120,15 @@ def progress(console, bytes_read, total_size, transfer_rate, eta):
     console.flush()
 
 
-def read_request(opener, url, offset=0, console=None,
+def read_request(session, url, offset=0, console=None,
                  progress_func=None, write_func=None):
     # support partial downloads
-    request = Request(url)
+    request = GetRequest(url)
     if offset > 0:
         request.add_header('Range', "bytes=%s-" % offset)
 
     try:
-        response = opener.open(request)
+        response = session.open(request)
     except HTTPError as e:
         if e.code == 416:  # Requested Range Not Satisfiable
             raise InvalidOffsetException
@@ -215,23 +205,12 @@ def download(data_path, url, path=".",
                 checksum.update(chunk)
             f.write(chunk)
 
-        cookie_jar = MozillaCookieJar(os.path.join(data_path, default.COOKIES_FILENAME))
-        try:
-            cookie_jar.load()
-        except Exception:
-            pass
+        # TODO add headers
 
-        opener = build_opener(
-            HTTPRedirectHandler(),
-            HTTPCookieProcessor(cookie_jar))
-
-        # request headers
-        if headers:
-            for key, value in headers.items():
-                request.add_header(key, value)
+        session = Session(data_path)
 
         try:
-            response = read_request(opener, url,
+            response = read_request(session, url,
                                     offset=size,
                                     console=console,
                                     progress_func=progress,
@@ -244,7 +223,7 @@ def download(data_path, url, path=".",
                 origin_checksum = util.unquote(response.headers.get(checksum_header))
             else:
                 # check whether file is already complete
-                meta = get_url_meta(opener, url, checksum_header)
+                meta = get_url_meta(session, url, checksum_header)
                 origin_checksum = util.unquote(meta.get('checksum'))
 
             if origin_checksum is None:
@@ -255,7 +234,5 @@ def download(data_path, url, path=".",
 
             if console:
                 console.write("%s checksum/%s OK\n" % (os.path.basename(path), checksum.name))
-
-        cookie_jar.save()
 
     return path
