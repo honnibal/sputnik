@@ -8,4 +8,4 @@ python:
   - pypy
 
 script:
-  - py.test shuttle/tests
+  - py.test -sv shuttle/tests
