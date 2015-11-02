@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import io
 import os
 import json
@@ -38,8 +39,8 @@ def sample_package_path():
     os.mkdir(data_path)
     with io.open(os.path.join(data_path, 'model1'), 'w') as f:
         for i in range(1):
-            f.write(str(i) * 1024)
+            f.write(('%s' % i) * 1024)
     with io.open(os.path.join(data_path, 'model2'), 'w') as f:
         for i in range(1):
-            f.write(str(i) * 1024)
+            f.write(('%s' % i) * 1024)
     return path
