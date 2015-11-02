@@ -44,7 +44,7 @@ class Command(Base):
 
     def upload(self, package_path, repository_url=default.upload_repository_url):
         index = Index(self.data_path, repository_url, s=self.s)
-        index.upload(package_path)
+        return index.upload(package_path)
 
     def update(self, repository_url=default.update_repository_url):
         index = Index(self.data_path, repository_url, s=self.s)

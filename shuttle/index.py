@@ -32,12 +32,16 @@ class Index(Base):
 
     def upload(self, path):
         from boto.s3.connection import S3Connection
+
+        access_key_id = os.environ['AWS_ACCESS_KEY_ID']
+        secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
+        region = os.environ['AWS_REGION']
+        bucket = os.environ['S3_BUCKET']
+
         os.environ['S3_USE_SIGV4'] = 'True'
-        conn = S3Connection(
-            os.environ.get('AWS_ACCESS_KEY_ID'),
-            os.environ.get('AWS_SECRET_ACCESS_KEY'),
-            host='s3.%s.amazonaws.com' % os.environ.get('AWS_REGION'))
-        bucket = conn.get_bucket(os.environ.get('S3_BUCKET'), validate=False)
+        conn = S3Connection(access_key_id, secret_access_key,
+            host='s3.%s.amazonaws.com' % region)
+        bucket = conn.get_bucket(bucket, validate=False)
 
         archive = Archive(path, s=self.s)
         for key_name, f in archive.fileobjs().items():
@@ -48,7 +52,9 @@ class Index(Base):
         request = PutRequest(urljoin(self.repository_url, '/reindex'))
         session = Session(self.data_path, s=self.s)
         response = session.open(request)
+
         self.s.log('reindex %s' % str(response.status == 200))
+        return True
 
     def is_package(self, name):
         return name in self.meta

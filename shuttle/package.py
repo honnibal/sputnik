@@ -23,7 +23,7 @@ class Package(Manifest):  # installed package
     @classmethod
     def find(cls, package_string, data_path, s):
         package_glob = os.path.join(data_path, package_string)
-        return [Package(p, s=s) for p in glob(package_glob)]
+        return [Package(p, s=s) for p in glob(package_glob) if os.path.isdir(p)]
 
     def remove(self):
         if not os.path.isdir(self.path):
