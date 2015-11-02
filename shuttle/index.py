@@ -129,3 +129,6 @@ class Index(Base):
             checksum=hashlib.md5(), checksum_header='etag', s=self.s)
 
         return Archive(os.path.dirname(path), s=self.s)
+
+    def list(self, search_string=None):
+        return [p for p in self.meta.keys() if search_string in p]

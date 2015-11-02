@@ -89,6 +89,20 @@ def add_list_parser(subparsers):
     parser.set_defaults(run=run)
 
 
+def add_search_parser(subparsers):
+    parser = subparsers.add_parser('search',
+        help='search installable packages on repository')
+    parser.add_argument('search_string',
+        nargs="?",
+        help='search string')
+
+    def run(args):
+        c = make_command(args)
+        c.search(search_string=args.search_string)
+
+    parser.set_defaults(run=run)
+
+
 def add_upload_parser(subparsers):
     parser = subparsers.add_parser('upload',
         help='upload package')
@@ -130,6 +144,7 @@ def get_parser():
     add_install_parser(subparsers)
     add_remove_parser(subparsers)
     add_list_parser(subparsers)
+    add_search_parser(subparsers)
     add_upload_parser(subparsers)
     add_update_parser(subparsers)
 

@@ -38,6 +38,13 @@ class Command(Base):
         for package in packages:
             package.remove()
 
+    def search(self, search_string):
+        index = Index(self.data_path, self.repository_url, s=self.s)
+        index.update()
+        package_names = index.list(search_string)
+        util.json_print(self.s.log, package_names)
+        return package_names
+
     def list(self, package_string=default.list_package_string, meta=default.list_meta):
         packages = Package.find(package_string, self.data_path, s=self.s)
         keys = not meta and ('name', 'version') or ()
