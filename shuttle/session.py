@@ -29,6 +29,11 @@ class Session(Base):
 
     def open(self, request, default_charset=None):
         request.add_header('User-Agent', self.s.user_agent())
+        if self.s.name:
+            request.add_header('X-Shuttle-Name', self.s.name)
+        if self.s.version:
+            request.add_header('X-Shuttle-Version', self.s.version)
+
         r = self.opener.open(request)
 
         if hasattr(r.headers, 'get_content_charset'):  # py3

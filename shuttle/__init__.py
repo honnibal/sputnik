@@ -24,7 +24,7 @@ class Shuttle(object):
             (platform.uname()[0], uname[2]),
             ('64bits', sys.maxsize > 2**32)]
 
-        return ' '.join(['%s/%s' % (k, v) for k, v in user_agent_vars])
+        return ' '.join(['%s/%s' % (k, v) for k, v in user_agent_vars if k])
 
     def log(self, message):
         if self.console:
