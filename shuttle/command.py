@@ -10,18 +10,20 @@ from .base import Base
 
 
 class Command(Base):
-    def __init__(self, data_path, **kwargs):
+    def __init__(self, data_path, repository_url, **kwargs):
         if not validation.is_data_path(data_path):
             raise Exception("%r must be a directory" % data_path)
+
         self.data_path = data_path
+        self.repository_url = repository_url
 
         super(Command, self).__init__(**kwargs)
 
-    def install(self, package_name_or_path, repository_url=default.install_repository_url):
+    def install(self, package_name_or_path):
         if os.path.isfile(package_name_or_path):
             archive = Archive(package_name_or_path, s=self.s)
         else:
-            index = Index(self.data_path, repository_url, s=self.s)
+            index = Index(self.data_path, self.repository_url, s=self.s)
             index.update()
             archive = index.cache(package_name_or_path)
         path = archive.install(self.data_path)
@@ -42,10 +44,10 @@ class Command(Base):
         util.json_print(self.s.log, [p.to_dict(keys) for p in packages])
         return packages
 
-    def upload(self, package_path, repository_url=default.upload_repository_url):
-        index = Index(self.data_path, repository_url, s=self.s)
+    def upload(self, package_path):
+        index = Index(self.data_path, self.repository_url, s=self.s)
         return index.upload(package_path)
 
-    def update(self, repository_url=default.update_repository_url):
-        index = Index(self.data_path, repository_url, s=self.s)
+    def update(self):
+        index = Index(self.data_path, self.repository_url, s=self.s)
         index.update()

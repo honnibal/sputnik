@@ -22,6 +22,9 @@ class PackageNotFoundException(Exception): pass
 
 class Index(Base):
     def __init__(self, data_path, repository_url, **kwargs):
+        if not repository_url:
+            raise Exception('invalid repository_url: %s' % repository_url)
+
         self.data_path = data_path
         self.repository_url = repository_url
 
@@ -53,13 +56,17 @@ class Index(Base):
         session = Session(self.data_path, s=self.s)
         response = session.open(request)
 
-        self.s.log('reindex %s' % str(response.status == 200))
-        return True
+        res = response.getcode() == 200
+        self.s.log('reindex %s' % str(res))
+        return res
 
     def is_package(self, name):
         return name in self.meta
 
     def update(self):
+        if not self.data_path:
+            raise Exception('invalid data_path: %s' % repository_url)
+
         # read cache
         # cached = {}
         # if os.path.exists(cache_path):
@@ -69,7 +76,7 @@ class Index(Base):
         #             cached[name] = (etag, filename + ext)
 
 
-        request = GetRequest(self.repository_url)
+        request = GetRequest(urljoin(self.repository_url, '/index'))
         session = Session(self.data_path, s=self.s)
         index = json.load(session.open(request, 'utf8'))
 

@@ -20,8 +20,12 @@ def package_path_type(path):
 
 
 def make_command(args):
-    s = Shuttle(name=args.name, version=args.version, console=sys.stdout)
-    return s.make_command(args.data_path)
+    s = Shuttle(name=args.name,
+                version=args.version,
+                console=sys.stdout)
+    return s.make_command(
+        data_path=args.data_path,
+        repository_url=args.repository_url)
 
 
 def add_build_parser(subparsers):
@@ -35,24 +39,20 @@ def add_build_parser(subparsers):
 
     def run(args):
         c = make_command(args)
-        c.build(args.package_path)
+        c.build(package_path=args.package_path)
 
     parser.set_defaults(run=run)
 
 
 def add_install_parser(subparsers):
     parser = subparsers.add_parser('install',
-        help='install package from repository')
+        help='install package from repository or filesystem')
     parser.add_argument('package_name_or_path',
         help='package name or path')
-    parser.add_argument('repository_url',
-        default=default.install_repository_url,
-        nargs='?',
-        help='repository url')
 
     def run(args):
         c = make_command(args)
-        c.install(args.package_name_or_path, args.repository_url)
+        c.install(package_name_or_path=args.package_name_or_path)
 
     parser.set_defaults(run=run)
 
@@ -65,7 +65,7 @@ def add_remove_parser(subparsers):
 
     def run(args):
         c = make_command(args)
-        c.remove(args.package_string)
+        c.remove(package_string=args.package_string)
 
     parser.set_defaults(run=run)
 
@@ -94,16 +94,10 @@ def add_upload_parser(subparsers):
         help='upload package')
     parser.add_argument('package_path',
         help='package path')
-    parser.add_argument('repository_url',
-        default=default.upload_repository_url,
-        nargs='?',
-        help='repository url')
 
     def run(args):
         c = make_command(args)
-        c.upload(
-            package_path=args.package_path,
-            repository_url=args.repository_url)
+        c.upload(package_path=args.package_path)
 
     parser.set_defaults(run=run)
 
@@ -111,14 +105,10 @@ def add_upload_parser(subparsers):
 def add_update_parser(subparsers):
     parser = subparsers.add_parser('update',
         help='update package cache')
-    parser.add_argument('repository_url',
-        default=default.update_repository_url,
-        nargs='?',
-        help='repository url')
 
     def run(args):
         c = make_command(args)
-        c.update(repository_url=args.repository_url)
+        c.update()
 
     parser.set_defaults(run=run)
 
@@ -131,8 +121,9 @@ def get_parser():
         help='project version')
     parser.add_argument('--data-path',
         type=data_path_type,
-        required=True,
         help='data storage path')
+    parser.add_argument('--repository-url',
+        help='package repository path')
 
     subparsers = parser.add_subparsers()
     add_build_parser(subparsers)

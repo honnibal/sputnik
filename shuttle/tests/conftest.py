@@ -7,6 +7,7 @@ import tempfile
 import pytest
 
 from .. import util
+from .. import Shuttle
 
 
 @pytest.fixture
@@ -44,3 +45,11 @@ def sample_package_path():
         for i in range(1):
             f.write(('%s' % i) * 1024)
     return path
+
+
+@pytest.fixture
+def command(tmp_path):
+    s = Shuttle('test', '1.0')
+    return s.make_command(
+        data_path=tmp_path,
+        repository_url=os.environ.get('REPOSITORY_URL'))

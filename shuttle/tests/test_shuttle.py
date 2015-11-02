@@ -3,10 +3,7 @@ import os
 from .. import Shuttle
 
 
-def test_build_install_remove(sample_package_path, tmp_path):
-    s = Shuttle('test', '1.0')
-    command = s.make_command(data_path=tmp_path)
-
+def test_build_install_remove(command, sample_package_path, tmp_path):
     archive = command.build(sample_package_path)
     assert os.path.isfile(archive.path)
 

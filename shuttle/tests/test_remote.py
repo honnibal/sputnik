@@ -6,10 +6,7 @@ from .. import Shuttle
 
 
 @pytest.mark.remote
-def test_install_package(tmp_path):
-    s = Shuttle('test', '1.0')
-    command = s.make_command(data_path=tmp_path)
-
+def test_install_package(command):
     packages = command.list()
     assert len(packages) == 0
 
@@ -22,10 +19,7 @@ def test_install_package(tmp_path):
 
 
 @pytest.mark.remote
-def test_upgrade_package(tmp_path):
-    s = Shuttle('test', '1.0')
-    command = s.make_command(data_path=tmp_path)
-
+def test_upgrade_package(command):
     packages = command.list()
     assert len(packages) == 0
 
@@ -42,10 +36,7 @@ def test_upgrade_package(tmp_path):
 
 
 @pytest.mark.remote
-def test_upload_package(sample_package_path):
-    s = Shuttle('test', '1.0')
-    command = s.make_command(data_path='.')
-
+def test_upload_package(command, sample_package_path):
     archive = command.build(sample_package_path)
     assert os.path.isfile(archive.path)
 
