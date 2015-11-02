@@ -13,7 +13,12 @@ from . import default
 
 class ArchiveWriter(object):
     def __init__(self, path, base_path=None, hash_func=hashlib.sha256):
-        if not hash_func or hash_func().name not in hashlib.algorithms_available:
+        if hasattr(hashlib, 'algorithms_available'):
+            algorithms = hashlib.algorithms_available
+        else:
+            algorithms = hashlib.algorithms
+
+        if not hash_func or hash_func().name not in algorithms:
             raise Exception('invalid hash_func')
 
         self.hash_func = hash_func
