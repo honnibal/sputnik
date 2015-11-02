@@ -57,7 +57,7 @@ class Index(Base):
         response = session.open(request)
 
         res = response.getcode() == 200
-        self.s.log('reindex %s' % str(res))
+        self.s.log('reindex %s' % res)
         return res
 
     def is_package(self, name):

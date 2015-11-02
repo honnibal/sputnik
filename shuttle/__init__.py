@@ -19,6 +19,7 @@ class Shuttle(object):
         uname = platform.uname()
         user_agent_vars = [
             ('Shuttle', '1.0'),
+            (self.name, self.version),
             (platform.python_implementation(), platform.python_version()),
             (platform.uname()[0], uname[2]),
             ('64bits', sys.maxsize > 2**32)]
