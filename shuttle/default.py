@@ -3,6 +3,7 @@ import os
 # cli/param defaults
 list_meta = False
 list_package_string = '*'
+search_string = ''
 build_package_path = '.'
 
 # misc

@@ -38,7 +38,7 @@ class Command(Base):
         for package in packages:
             package.remove()
 
-    def search(self, search_string):
+    def search(self, search_string=default.search_string):
         index = Index(self.data_path, self.repository_url, s=self.s)
         index.update()
         package_names = index.list(search_string)
