@@ -8,7 +8,8 @@ python:
   - pypy
 
 install:
-  - pip install --user boto
+  - pip install --upgrade pip
+  - pip install boto
 
 script:
   - py.test -sv shuttle/tests
