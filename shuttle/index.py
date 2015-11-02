@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import io
 import json
@@ -15,14 +14,13 @@ from . import util
 from . import uget
 from .archive import Archive
 from .session import Session, GetRequest, PutRequest
-
-from boto.s3.connection import S3Connection
+from .base import Base
 
 
 class PackageNotFoundException(Exception): pass
 
 
-class Index(object):
+class Index(Base):
     def __init__(self, data_path, repository_url, **kwargs):
         self.data_path = data_path
         self.repository_url = repository_url
@@ -30,7 +28,10 @@ class Index(object):
         self.meta = {}
         self.urls = {}
 
+        super(Index, self).__init__(**kwargs)
+
     def upload(self, path):
+        from boto.s3.connection import S3Connection
         os.environ['S3_USE_SIGV4'] = 'True'
         conn = S3Connection(
             os.environ.get('AWS_ACCESS_KEY_ID'),
@@ -38,16 +39,16 @@ class Index(object):
             host='s3.%s.amazonaws.com' % os.environ.get('AWS_REGION'))
         bucket = conn.get_bucket(os.environ.get('S3_BUCKET'), validate=False)
 
-        archive = Archive(path)
+        archive = Archive(path, s=self.s)
         for key_name, f in archive.fileobjs().items():
-            print('uploading %s...' % key_name)
+            self.s.log('uploading %s...' % key_name)
             key = bucket.new_key(key_name)
             key.set_contents_from_file(f)
 
         request = PutRequest(urljoin(self.repository_url, '/reindex'))
-        session = Session(self.data_path)
+        session = Session(self.data_path, s=self.s)
         response = session.open(request)
-        print('reindex', response.status == 200)
+        self.s.log('reindex %s' % str(response.status == 200))
 
     def is_package(self, name):
         return name in self.meta
@@ -63,7 +64,7 @@ class Index(object):
 
 
         request = GetRequest(self.repository_url)
-        session = Session(self.data_path)
+        session = Session(self.data_path, s=self.s)
         index = json.load(session.open(request, 'utf8'))
 
         meta = {}
@@ -111,7 +112,7 @@ class Index(object):
 
         util.makedirs(path)
         # TODO etag header is not md5 for multipart uploads
-        uget.download(self.data_path, url, path, console=sys.stdout,
-            checksum=hashlib.md5(), checksum_header='etag')
+        uget.download(self.data_path, url, path, console=self.s.console,
+            checksum=hashlib.md5(), checksum_header='etag', s=self.s)
 
-        return Archive(os.path.dirname(path))
+        return Archive(os.path.dirname(path), s=self.s)

@@ -5,7 +5,7 @@ class Manifest(Base):
     keys = ['name', 'version', 'description', 'model', 'dependencies',
             'languages', 'license', 'compatibility']
 
-    def __init__(self, defaults=None):
+    def __init__(self, defaults=None, **kwargs):
         defaults = defaults or {}
         self.name = defaults.get('name')
         self.version = defaults.get('version', {})
@@ -15,6 +15,8 @@ class Manifest(Base):
         self.languages = defaults.get('languages')
         self.license = defaults.get('license')
         self.compatibility = defaults.get('compatibility')
+
+        super(Manifest, self).__init__(**kwargs)
 
     def package_name(self):
         return '%s-%s' % (self.name, self.version)

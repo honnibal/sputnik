@@ -1,4 +1,3 @@
-from __future__ import print_function
 import shutil
 import json
 import io
@@ -29,9 +28,9 @@ def json_load(path):
         return json.loads(f.read().decode('utf8'))
 
 
-def json_print(obj):
+def json_print(print_func, obj):
     defaults = {'sort_keys': True, 'indent': 2, 'separators': (',', ': ')}
-    print(json.dumps(obj, **defaults))
+    print_func(json.dumps(obj, **defaults))
 
 
 def makedirs(path):

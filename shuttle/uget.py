@@ -185,7 +185,7 @@ def read_request(session, url, offset=0, console=None,
 
 def download(data_path, url, path=".",
              checksum=None, checksum_header=None,
-             headers=None, console=None):
+             headers=None, console=None, s=None):
 
     if os.path.isdir(path):
         path = os.path.join(path, url.rsplit('/', 1)[1])
@@ -207,7 +207,7 @@ def download(data_path, url, path=".",
 
         # TODO add headers
 
-        session = Session(data_path)
+        session = Session(data_path, s=s)
 
         try:
             response = read_request(session, url,

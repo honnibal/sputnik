@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import io
 import time
@@ -13,18 +12,17 @@ from .archive_reader import ArchiveReader
 
 
 class NewArchive(Manifest):  # package archive
-    def __init__(self, recipe, path, hash_func):
-        self.path = path
+    def __init__(self, recipe, path, hash_func, **kwargs):
         self.hash_func = hash_func
         self.archive = None
-        self.filename = util.archive_filename(
+        filename = util.archive_filename(
             recipe.name, recipe.version, suffix=True)
+        self.path = os.path.join(path, filename)
 
-        Manifest.__init__(self, recipe.to_dict())
+        super(NewArchive, self).__init__(recipe.to_dict(), **kwargs)
 
     def __enter__(self):
-        archive_path = os.path.join(self.path, self.filename)
-        self.archive = ArchiveWriter(archive_path)
+        self.archive = ArchiveWriter(self.path)
         return self
 
     def __exit__(self, type, value, traceback):
@@ -42,13 +40,13 @@ class NewArchive(Manifest):  # package archive
 
 
 class Archive(Manifest):
-    def __init__(self, path):
+    def __init__(self, path, **kwargs):
         self.path = path
         self.archive = ArchiveReader(path)
 
         defaults = self.archive.get_member('package')
 
-        Manifest.__init__(self, defaults)
+        super(Archive, self).__init__(defaults, **kwargs)
 
     def cleanup(self, data_path):
         tmp_install_dir = data_path + ".install"
@@ -56,12 +54,12 @@ class Archive(Manifest):
     
         # cleanup remove
         if os.path.exists(tmp_remove_dir):
-            print("remove", tmp_remove_dir)
+            self.s.log('remove %s' % tmp_remove_dir)
             shutil.rmtree(tmp_remove_dir)
     
         # cleanup install
         if os.path.exists(tmp_install_dir):
-            print("install", tmp_install_dir)
+            self.s.log('install %s' % tmp_install_dir)
             os.rename(tmp_install_dir, data_path)
 
     def fileobjs(self):
@@ -83,16 +81,17 @@ class Archive(Manifest):
             raise Exception("not enough space")
     
         # tmp install
-        print("pending install", tmp_install_dir)
+        self.s.log('pending install %s' % os.path.basename(tmp_install_dir))
         self.archive.extract_all(tmp_install_dir)
     
         # make way
         if os.path.exists(dest_dir):
-            print("pending remove", dest_dir)
+            self.s.log('pending remove %s' % dest_dir)
             os.rename(dest_dir, tmp_remove_dir)
     
         # install
-        print("install", dest_dir)
+        self.s.log('install %s' % dest_dir)
         shutil.move(tmp_install_dir, dest_dir)
     
         self.cleanup(dest_dir)
+        return dest_dir
