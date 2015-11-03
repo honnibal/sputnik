@@ -10,10 +10,10 @@ def test_install_package(command):
     packages = command.list()
     assert len(packages) == 0
 
-    package = command.install('test-1.0.0')
+    package = command.install('test')
     assert os.path.isdir(package.path)
 
-    packages = command.list(package.package_name())
+    packages = command.list()
     assert len(packages) == 1
     assert packages[0].package_name() == package.package_name()
 
@@ -23,10 +23,10 @@ def test_upgrade_package(command):
     packages = command.list()
     assert len(packages) == 0
 
-    package1 = command.install('test-1.0.0')
+    package1 = command.install('test ==1.0.0')
     assert os.path.isdir(package1.path)
 
-    package2 = command.install('test-2.0.0')
+    package2 = command.install('test ==2.0.0')
     assert os.path.isdir(package2.path)
 
     packages = command.list()

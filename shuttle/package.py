@@ -1,8 +1,8 @@
 import os
 import io
 from hashlib import sha256
-from glob import glob
 import shutil
+from glob import glob
 
 from . import util
 from . import validation
@@ -25,15 +25,19 @@ class Package(Manifest):  # installed package
     def find(cls, package_string, data_path, s):
         packages = []
 
-        ps = PackageString(package_string)
-        package_glob = os.path.join(data_path, '*')
-
-        for p in glob(package_glob):
-            if not os.path.isdir(p):
+        for p in os.listdir(data_path):
+            if p.startswith('.') or not os.path.isdir(os.path.join(data_path, p)):
                 continue
 
-            package = Package(p, s=s)
-            if ps.match(PackageString(name=package.name, version=package.version)):
+            package = Package(os.path.join(data_path, p), s=s)
+
+            if not package_string:
+                packages.append(package)
+                continue
+
+            ps = PackageString(package_string)
+            if ps.match(PackageString(name=package.name,
+                                      version=package.version)):
                 packages.append(package)
 
         return packages
