@@ -29,6 +29,7 @@ class Manifest(Base):
     def is_compatible(self):
         if self.s.name and self.s.version:
             compatible_version = self.compatibility.get(self.s.name)
-            if compatible_version:
-                return semver.match(self.s.version, compatible_version)
+            if not compatible_version:
+                return False
+            return semver.match(self.s.version, compatible_version)
         return True

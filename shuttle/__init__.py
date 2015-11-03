@@ -2,12 +2,15 @@ import os
 import sys
 import platform
 
+import semver
+
 from .command import Command
 
 
 class Shuttle(object):
     def __init__(self, name, version, console=None):
         self.name = name
+        semver.parse(version)  # raises ValueError when invalid
         self.version = version
         self.console = console
 

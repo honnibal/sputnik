@@ -34,7 +34,7 @@ def sample_package_path():
             "languages": ["en"],
             "version": "1.0.0",
             "license": "public domain",
-            "compatibility": {}
+            "compatibility": {"test": "==1.0.0"}
         }))
     data_path = os.path.join(path, 'data')
     os.mkdir(data_path)
@@ -49,7 +49,7 @@ def sample_package_path():
 
 @pytest.fixture
 def command(tmp_path):
-    s = Shuttle('test', '1.0')
+    s = Shuttle('test', '1.0.0')
     return s.make_command(
         data_path=tmp_path,
         repository_url=os.environ.get('REPOSITORY_URL'))
