@@ -22,7 +22,7 @@ class NewArchive(Manifest):  # package archive
         super(NewArchive, self).__init__(recipe.to_dict(), **kwargs)
 
     def __enter__(self):
-        self.archive = ArchiveWriter(self.path)
+        self.archive = ArchiveWriter(self.path, base_path=os.path.dirname(self.path))
         return self
 
     def __exit__(self, type, value, traceback):

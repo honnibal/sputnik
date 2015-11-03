@@ -13,6 +13,7 @@ from . import default
 from . import util
 from . import uget
 from .archive import Archive
+from .manifest import Manifest
 from .session import Session, GetRequest, PutRequest
 from .base import Base
 from .package_string import PackageString
@@ -64,8 +65,11 @@ class Index(Base):
     def get_package_name(self, name):
         package_strings = []
         for key, value in self.meta.items():
+
+            manifest = Manifest(value['package'], s=self.s)
             ps = PackageString(key)
-            if PackageString(name).match(ps):
+
+            if manifest.is_compatible() and PackageString(name).match(ps):
                 package_strings.append((ps, key))
 
         res = sorted(package_strings)

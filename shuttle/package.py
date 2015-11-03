@@ -92,6 +92,6 @@ class PackageRecipe(Base):  # package.json recipe
             self.s.log("build %s" % archive.path)
 
             for include in self.include:
-                for path in glob(os.path.join(archive_path, include)):
+                for path in glob(os.path.join(self.path, include)):
                     archive.add_file(path)
             return archive

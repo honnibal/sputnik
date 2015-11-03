@@ -1,3 +1,5 @@
+import semver
+
 from .base import Base
 
 
@@ -23,3 +25,10 @@ class Manifest(Base):
 
     def is_valid(self):
         pass
+
+    def is_compatible(self):
+        if self.s.name and self.s.version:
+            compatible_version = self.compatibility.get(self.s.name)
+            if compatible_version:
+                return semver.match(self.s.version, compatible_version)
+        return True
