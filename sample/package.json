@@ -7,5 +7,7 @@
   "languages": ["en"],
   "version": "1.0.0",
   "license": "public domain",
-  "compatibility": {}
+  "compatibility": {
+    "spacy": "==0.94.0"
+  }
 }
