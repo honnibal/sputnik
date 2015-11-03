@@ -10,6 +10,7 @@ python:
 install:
   - pip install --upgrade pip
   - pip install boto
+  - pip install -r requirements.txt
 
 script:
   - py.test -sv shuttle/tests
