@@ -15,6 +15,7 @@ from . import uget
 from .archive import Archive
 from .session import Session, GetRequest, PutRequest
 from .base import Base
+from .package_string import PackageString
 
 
 class PackageNotFoundException(Exception): pass
@@ -60,8 +61,16 @@ class Index(Base):
         self.s.log('reindex %s' % res)
         return res
 
-    def is_package(self, name):
-        return name in self.meta
+    def get_package_name(self, name):
+        package_strings = []
+        for key, value in self.meta.items():
+            ps = PackageString(key)
+            if PackageString(name).match(ps):
+                package_strings.append((ps, key))
+
+        res = sorted(package_strings)
+        if res:
+            return res[-1][1]
 
     def update(self):
         if not self.data_path:
@@ -113,9 +122,10 @@ class Index(Base):
         self.meta = meta
         self.urls = urls
 
-    def cache(self, name):
-        if not self.is_package(name):
-            raise PackageNotFoundException(name)
+    def cache(self, package_string):
+        name = self.get_package_name(package_string)
+        if not name:
+            raise PackageNotFoundException(package_string)
 
         archive_url, checksum = self.meta[name]['archive']
         url = urljoin(self.urls[name], archive_url)

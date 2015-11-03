@@ -10,6 +10,7 @@ from . import default
 from .manifest import Manifest
 from .archive import NewArchive
 from .base import Base
+from .package_string import PackageString
 
 
 class Package(Manifest):  # installed package
@@ -22,8 +23,20 @@ class Package(Manifest):  # installed package
 
     @classmethod
     def find(cls, package_string, data_path, s):
-        package_glob = os.path.join(data_path, package_string)
-        return [Package(p, s=s) for p in glob(package_glob) if os.path.isdir(p)]
+        packages = []
+
+        ps = PackageString(package_string)
+        package_glob = os.path.join(data_path, '*')
+
+        for p in glob(package_glob):
+            if not os.path.isdir(p):
+                continue
+
+            package = Package(p, s=s)
+            if ps.match(PackageString(name=package.name, version=package.version)):
+                packages.append(package)
+
+        return packages
 
     def remove(self):
         if not os.path.isdir(self.path):
@@ -50,8 +63,12 @@ class PackageRecipe(Base):  # package.json recipe
         package_json_path = os.path.join(path, "package.json")
         defaults = util.json_load(package_json_path)
 
-        self.name = defaults.get('name')
-        self.version = defaults.get('version', {})
+        ps = PackageString(
+            name=defaults.get('name'),
+            version=defaults.get('version', {}))
+
+        self.name = ps.name
+        self.version = ps.version
         self.description = defaults.get('description')
         self.include = defaults.get('include')
         self.model = defaults.get('model')
