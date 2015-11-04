@@ -50,9 +50,15 @@ class Index(Base):
 
         archive = Archive(path, s=self.s)
         for key_name, f in archive.fileobjs().items():
+            self.s.log('preparing upload for %s' % key_name)
+            headers = {
+                util.s3_header('md5'): hashlib.md5(f.read()).hexdigest()
+            }
+            f.seek(os.SEEK_SET, 0)
+
             self.s.log('uploading %s...' % key_name)
             key = bucket.new_key(key_name)
-            key.set_contents_from_file(f)
+            key.set_contents_from_file(f, headers=headers)
 
         request = PutRequest(urljoin(self.repository_url, '/reindex'))
         session = Session(self.data_path, s=self.s)
@@ -138,9 +144,8 @@ class Index(Base):
         path = os.path.join(self.data_path, '.' + name, filename)
 
         util.makedirs(path)
-        # TODO etag header is not md5 for multipart uploads
         uget.download(self.data_path, url, path, console=self.s.console,
-            checksum=hashlib.md5(), checksum_header='etag', s=self.s)
+            checksum=hashlib.md5(), checksum_header=util.s3_header('md5'), s=self.s)
 
         return Archive(os.path.dirname(path), s=self.s)
 

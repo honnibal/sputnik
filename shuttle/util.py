@@ -2,6 +2,7 @@ import shutil
 import json
 import io
 import os
+import re
 
 
 def is_enough_space(path, size):
@@ -43,3 +44,9 @@ def unquote(s):
     if (s[0] == s[-1]) and s.startswith(("'", '"')):
         return s[1:-1]
     return s
+
+
+def s3_header(value):
+    if not re.match(r'[A-Za-z0-9-]+', value):
+        raise Exception('invalid value for S3 header: %s' % value)
+    return 'x-amz-meta-%s' % value.lower()
