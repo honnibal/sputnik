@@ -46,5 +46,4 @@ def test_upload_package(command, sample_package_path):
 
 @pytest.mark.remote
 def test_search_packages(command):
-    package_names = command.search()
-    assert package_names
+    assert command.search()

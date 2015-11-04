@@ -124,7 +124,8 @@ class Index(Base):
             util.makedirs(path)
 
             request = GetRequest(urls[name])
-            meta[name] = json.load(session.open(request, 'utf8'))
+            response = session.open(request, 'utf8')
+            meta[name] = json.load(response)
 
             with io.open(path, 'wb') as f:
                 f.write(util.json_dump(meta[name]))
@@ -150,4 +151,4 @@ class Index(Base):
         return Archive(os.path.dirname(path), s=self.s)
 
     def list(self, search_string=None):
-        return [p for p in self.meta.keys() if search_string in p]
+        return [Manifest(v['package'], s=self.s) for k, v in self.meta.items() if not search_string or search_string in k]
