@@ -49,7 +49,7 @@ def sample_package_path():
 
 @pytest.fixture
 def command(tmp_path):
-    s = Shuttle('test', '1.0.0')
+    s = Shuttle(None, None)
     return s.make_command(
         data_path=tmp_path,
         repository_url=os.environ.get('REPOSITORY_URL'))
