@@ -220,7 +220,8 @@ def download(data_path, url, path=".",
 
         if checksum:
             if response:
-                origin_checksum = util.unquote(response.headers.get(checksum_header))
+                origin_checksum = util.unquote(
+                    response.headers.get(checksum_header, ''))
             else:
                 # check whether file is already complete
                 meta = get_url_meta(session, url, checksum_header)
