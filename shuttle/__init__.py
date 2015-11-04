@@ -22,7 +22,7 @@ class Shuttle(object):
     def user_agent(self):
         uname = platform.uname()
         user_agent_vars = [
-            ('Shuttle', '1.0'),
+            ('Shuttle', '1.0.0'),
             (self.name, self.version),
             (platform.python_implementation(), platform.python_version()),
             (platform.uname()[0], uname[2]),
