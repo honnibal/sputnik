@@ -7,12 +7,6 @@ from . import default
 from . import Shuttle
 
 
-def data_path_type(path):
-    if not validation.is_data_path(path):
-        raise argparse.ArgumentTypeError("%r must be a directory")
-    return path
-
-
 def package_path_type(path):
     if not validation.is_package_path(path):
         raise argparse.ArgumentTypeError("%r must be a directory")
@@ -127,6 +121,21 @@ def add_update_parser(subparsers):
     parser.set_defaults(run=run)
 
 
+def add_file_parser(subparsers):
+    parser = subparsers.add_parser('file',
+        help='displays file path')
+    parser.add_argument('package_string',
+        help='package string')
+    parser.add_argument('path',
+        help='file path')
+
+    def run(args):
+        c = make_command(args)
+        c.file(package_string=args.package_string,
+               path=args.path)
+
+    parser.set_defaults(run=run)
+
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--name',
@@ -134,7 +143,6 @@ def get_parser():
     parser.add_argument('--version',
         help='project version')
     parser.add_argument('--data-path',
-        type=data_path_type,
         help='data storage path')
     parser.add_argument('--repository-url',
         help='package repository path')
@@ -147,6 +155,7 @@ def get_parser():
     add_search_parser(subparsers)
     add_upload_parser(subparsers)
     add_update_parser(subparsers)
+    add_file_parser(subparsers)
 
     return parser
 

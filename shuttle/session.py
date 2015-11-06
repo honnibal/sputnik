@@ -10,11 +10,15 @@ except ImportError:
     from urllib2 import Request, build_opener, HTTPRedirectHandler, HTTPCookieProcessor
 
 from . import default
+from . import validation
 from .base import Base
 
 
 class Session(Base):
     def __init__(self, data_path, **kwargs):
+        if not validation.is_data_path(data_path):
+            raise Exception('invalid data_path: %s' % data_path)
+
         self.cookie_jar = MozillaCookieJar(os.path.join(data_path, default.COOKIES_FILENAME))
         try:
             cookie_jar.load()
@@ -48,7 +52,7 @@ class Session(Base):
         return codecs.getreader(charset)(r)
 
     def __del__(self):
-        self.cookie_jar.save()
+        hasattr(self, 'cookie_jar') and self.cookie_jar.save()
 
 
 class GetRequest(Request):

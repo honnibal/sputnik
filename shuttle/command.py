@@ -1,4 +1,5 @@
 import os
+import io
 
 from . import validation
 from . import default
@@ -10,8 +11,8 @@ from .base import Base
 
 
 class Command(Base):
-    def __init__(self, data_path, repository_url, **kwargs):
-        if not validation.is_data_path(data_path):
+    def __init__(self, data_path, repository_url=None, **kwargs):
+        if data_path and not validation.is_data_path(data_path):
             raise Exception("%r must be a directory" % data_path)
 
         self.data_path = data_path
@@ -58,3 +59,9 @@ class Command(Base):
     def update(self):
         index = Index(self.data_path, self.repository_url, s=self.s)
         index.update()
+
+    def file(self, package_string, path):
+        package = Package.get(package_string, self.data_path, s=self.s)
+        file_path = package.file_path(path)
+        util.json_print(self.s.log, file_path)
+        return io.open(file_path, 'rb')

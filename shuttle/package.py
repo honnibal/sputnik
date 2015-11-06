@@ -16,17 +16,39 @@ from .package_string import PackageString
 class Package(Manifest):  # installed package
     def __init__(self, path, **kwargs):
         self.path = path
-        defaults = util.json_load(os.path.join(path,
-            default.META_FILENAME))['package']
+        self.meta = util.json_load(os.path.join(path,
+            default.META_FILENAME))
 
-        super(Package, self).__init__(defaults, **kwargs)
+        super(Package, self).__init__(self.meta['package'], **kwargs)
+
+    def has_file(self, path):
+        return any([m for m in self.meta['manifest'] if m['path'] == path])
+
+    def file_path(self, path):
+        if not self.has_file(path):
+            raise Exception('package does not include file: %s' % path)
+
+        file_path = os.path.join(self.path, path)
+        if not os.path.isfile(file_path):
+            raise Exception('file not found: %s' % path)
+
+        return file_path
+
+    @classmethod
+    def get(cls, package_name, data_path, s):
+        # TODO make sure we don't accept package_strings
+        packages = Package.find(package_name, data_path=data_path, s=s)
+        if not packages:
+            raise Exception('package not found: %s' % package_name)
+
+        return packages[-1]
 
     @classmethod
     def find(cls, package_string, data_path, s):
         packages = []
 
         for p in os.listdir(data_path):
-            if p.startswith('.') or not os.path.isdir(os.path.join(data_path, p)):
+            if p.startswith('__') or not os.path.isdir(os.path.join(data_path, p)):
                 continue
 
             package = Package(os.path.join(data_path, p), s=s)
@@ -40,7 +62,8 @@ class Package(Manifest):  # installed package
                                       version=package.version)):
                 packages.append(package)
 
-        return packages
+        return sorted(packages, key=lambda p:
+            PackageString(name=p.name, version=p.version))
 
     def remove(self):
         if not os.path.isdir(self.path):

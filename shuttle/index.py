@@ -12,6 +12,7 @@ except ImportError:
 from . import default
 from . import util
 from . import uget
+from . import validation
 from .archive import Archive
 from .manifest import Manifest
 from .session import Session, GetRequest, PutRequest
@@ -83,9 +84,6 @@ class Index(Base):
             return res[-1][1]
 
     def update(self):
-        if not self.data_path:
-            raise Exception('invalid data_path: %s' % repository_url)
-
         # read cache
         # cached = {}
         # if os.path.exists(cache_path):
@@ -93,7 +91,6 @@ class Index(Base):
         #         name, etag = filename.rsplit('-', 1)
         #         if ext == '.' + default.meta_extension:
         #             cached[name] = (etag, filename + ext)
-
 
         request = GetRequest(urljoin(self.repository_url, '/index'))
         session = Session(self.data_path, s=self.s)
@@ -104,6 +101,21 @@ class Index(Base):
 
         for name, (meta_url, etag) in index.items():
             urls[name] = urljoin(self.repository_url, meta_url)
+
+            request = GetRequest(urls[name])
+            response = session.open(request, 'utf8')
+            meta[name] = json.load(response)
+
+        self.meta = meta
+        self.urls = urls
+
+        self.write()
+
+    def write(self):
+        if not validation.is_data_path(self.data_path):
+            raise Exception('invalid data_path: %s' % self.data_path)
+
+        for package_name, meta_data in self.meta.items():
 
             # if name in cached:
             #     print(name, '(cached)')
@@ -119,30 +131,25 @@ class Index(Base):
             # else:
             #     print(name)
 
-            filename = os.path.basename(meta_url)
-            path = os.path.join(self.data_path, '.' + name, filename)
+            filename = os.path.basename(self.urls[package_name])
+            path = os.path.join(self.data_path, '__cache__',
+                package_name, filename)
             util.makedirs(path)
 
-            request = GetRequest(urls[name])
-            response = session.open(request, 'utf8')
-            meta[name] = json.load(response)
-
             with io.open(path, 'wb') as f:
-                f.write(util.json_dump(meta[name]))
-
-        self.meta = meta
-        self.urls = urls
+                f.write(util.json_dump(meta_data))
 
     def cache(self, package_string):
-        name = self.get_package_name(package_string)
-        if not name:
+        package_name = self.get_package_name(package_string)
+        if not package_name:
             raise PackageNotFoundException(package_string)
 
-        archive_url, checksum = self.meta[name]['archive']
-        url = urljoin(self.urls[name], archive_url)
+        archive_url, checksum = self.meta[package_name]['archive']
+        url = urljoin(self.urls[package_name], archive_url)
 
         filename = os.path.basename(archive_url)
-        path = os.path.join(self.data_path, '.' + name, filename)
+        path = os.path.join(self.data_path, '__cache__',
+            package_name, filename)
 
         util.makedirs(path)
         uget.download(self.data_path, url, path, console=self.s.console,
