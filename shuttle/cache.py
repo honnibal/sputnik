@@ -96,25 +96,28 @@ class Cache(Base):
         candidates = []
         query = PackageString(package_string)
 
-        for package in self.list():
+        for package in self._packages.values():
             ps = PackageString(package=package)
-
             if query.match(ps):
-                if not package.is_compatible():
-                    raise PackageNotCompatibleException(
-                        'running %s %s but requires %s' %
-                        (self.s.name, self.s.version, package.compatibility))
-
                 candidates.append(ps)
 
         if candidates:
-            return sorted(candidates)[-1].package
+            candidates.sort(key=lambda c: (c.package.is_compatible(), c))
+            package = candidates[-1].package
+
+            if not package.is_compatible():
+                raise PackageNotCompatibleException(
+                    'running %s %s but requires %s' %
+                    (self.s.name, self.s.version, package.compatibility))
+
+            return package
 
     def list(self):
-        return self._packages.values()
+        return [p for p in self._packages.values() if p.is_compatible()]
 
     def update(self, meta, url):
         assert len(meta['archive']) == 2
+        meta = dict(meta)
 
         package = PackageStub(meta['package'], s=self.s)
 
