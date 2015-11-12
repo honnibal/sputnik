@@ -41,12 +41,12 @@ def add_build_parser(subparsers):
 def add_install_parser(subparsers):
     parser = subparsers.add_parser('install',
         help='install package from repository or filesystem')
-    parser.add_argument('package_name_or_path',
+    parser.add_argument('package_name',
         help='package name or path')
 
     def run(args):
         c = make_command(args)
-        c.install(package_name_or_path=args.package_name_or_path)
+        c.install(package_name=args.package_name)
 
     parser.set_defaults(run=run)
 
@@ -136,6 +136,40 @@ def add_file_parser(subparsers):
 
     parser.set_defaults(run=run)
 
+
+def add_files_parser(subparsers):
+    parser = subparsers.add_parser('files',
+        help='displays package files')
+    parser.add_argument('package_string',
+        help='package string')
+
+    def run(args):
+        c = make_command(args)
+        c.files(package_string=args.package_string)
+
+    parser.set_defaults(run=run)
+
+
+def add_purge_parser(subparsers):
+    parser = subparsers.add_parser('purge',
+        help='purges downloaded data')
+    parser.add_argument('--cache',
+        default=False,
+        action='store_true',
+        help='purge cache')
+    parser.add_argument('--packages',
+        default=False,
+        action='store_true',
+        help='purge installed packages')
+
+    def run(args):
+        c = make_command(args)
+        c.purge(cache=args.cache,
+                packages=args.packages)
+
+    parser.set_defaults(run=run)
+
+
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--name',
@@ -156,6 +190,8 @@ def get_parser():
     add_upload_parser(subparsers)
     add_update_parser(subparsers)
     add_file_parser(subparsers)
+    add_files_parser(subparsers)
+    add_purge_parser(subparsers)
 
     return parser
 

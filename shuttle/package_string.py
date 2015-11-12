@@ -4,7 +4,7 @@ import semver
 
 
 class PackageString(object):
-    def __init__(self, string=None, name=None, version=None):
+    def __init__(self, string=None, name=None, version=None, package=None):
         if string:
             res = re.split(r'[\s-]', string, 1)
             if len(res) > 1:
@@ -14,6 +14,10 @@ class PackageString(object):
         elif name:
             self.name = name
             self.version = version
+        elif package:
+            self.name = package.name
+            self.version = package.version
+            self.package = package
         else:
             raise Exception('invalid package string: %s' % string)
 
@@ -46,4 +50,5 @@ class PackageString(object):
         return '%s %s' % (self.name, self.version)
 
     def match(self, other):
-        return self.name == other.name and (not self.version or semver.match(other.version, self.version))
+        return self.name == other.name and \
+            (not self.version or semver.match(other.version, self.version))

@@ -12,7 +12,7 @@ from . import default
 
 
 class ArchiveWriter(object):
-    def __init__(self, path, base_path=None, hash_func=hashlib.sha256):
+    def __init__(self, path, base_path=None, hash_func=hashlib.md5):
         if hasattr(hashlib, 'algorithms_available'):
             algorithms = hashlib.algorithms_available
         else:

@@ -2,8 +2,6 @@ import os
 
 import pytest
 
-from .. import Shuttle
-
 
 @pytest.mark.remote
 def test_install_package(command):

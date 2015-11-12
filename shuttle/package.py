@@ -1,28 +1,27 @@
 import os
-import io
-from hashlib import sha256
+from hashlib import md5
 import shutil
 from glob import glob
 
 from . import util
 from . import validation
 from . import default
-from .manifest import Manifest
 from .archive import NewArchive
 from .base import Base
 from .package_string import PackageString
+from .package_stub import PackageStub
 
 
-class Package(Manifest):  # installed package
+class Package(PackageStub):  # installed package
     def __init__(self, path, **kwargs):
         self.path = path
         self.meta = util.json_load(os.path.join(path,
-            default.META_FILENAME))
+                                                default.META_FILENAME))
 
         super(Package, self).__init__(self.meta['package'], **kwargs)
 
     def has_file(self, path):
-        return any([m for m in self.meta['manifest'] if m['path'] == path])
+        return any([m for m in self.manifest if m['path'] == path])
 
     def file_path(self, path):
         if not self.has_file(path):
@@ -34,17 +33,27 @@ class Package(Manifest):  # installed package
 
         return file_path
 
+    @property
+    def manifest(self):
+        return self.meta['manifest']
+
     @classmethod
     def get(cls, package_name, data_path, s):
         # TODO make sure we don't accept package_strings
-        packages = Package.find(package_name, data_path=data_path, s=s)
+        packages = Package.find(package_string=package_name,
+                                data_path=data_path, s=s)
         if not packages:
             raise Exception('package not found: %s' % package_name)
 
         return packages[-1]
 
     @classmethod
-    def find(cls, package_string, data_path, s):
+    def find(cls, data_path, s, package_string=None):
+        if data_path is None:
+            Exception('requires data_path: %s' % data_path)
+        if s is None:
+            Exception('requires s: %s' % s)
+
         packages = []
 
         for p in os.listdir(data_path):
@@ -63,7 +72,7 @@ class Package(Manifest):  # installed package
                 packages.append(package)
 
         return sorted(packages, key=lambda p:
-            PackageString(name=p.name, version=p.version))
+                      PackageString(name=p.name, version=p.version))
 
     def remove(self):
         if not os.path.isdir(self.path):
@@ -111,7 +120,7 @@ class PackageRecipe(Base):  # package.json recipe
             raise Exception("missing include")
 
     def build(self, archive_path):
-        with NewArchive(self, archive_path, sha256, s=self.s) as archive:
+        with NewArchive(self, archive_path, md5, s=self.s) as archive:
             self.s.log("build %s" % archive.path)
 
             for include in self.include:

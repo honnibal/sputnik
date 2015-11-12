@@ -19,12 +19,15 @@ class ArchiveReader(object):
         if os.path.isdir(path):
             self.tar = None
             self.meta = util.json_load(os.path.join(path, default.META_FILENAME))
-            self.archive = io.open(os.path.join(path, self.meta['archive'][0]), 'rb')
+            self.archive = io.open(os.path.join(path, self.filename()), 'rb')
 
         else:  # expect tar
             self.tar = tarfile.open(self.path, 'r')
             self.meta = self.get_meta()
-            self.archive = self.tar.extractfile(self.meta['archive'][0])
+            self.archive = self.tar.extractfile(self.filename())
+
+    def filename(self):
+        return os.path.basename(self.meta['archive'][0])
 
     def __enter__(self):
         return self

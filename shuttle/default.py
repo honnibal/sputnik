@@ -1,5 +1,3 @@
-import os
-
 # cli/param defaults
 list_meta = False
 list_package_string = ''
@@ -12,3 +10,4 @@ ARCHIVE_FILENAME = 'archive.gz'
 META_FILENAME = 'meta.json'
 COMPRESSLEVEL = 9
 COOKIES_FILENAME = 'cookies.txt'
+CACHE_DIRNAME = '__cache__'

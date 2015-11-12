@@ -50,3 +50,13 @@ def s3_header(value):
     if not re.match(r'[A-Za-z0-9-]+', value):
         raise Exception('invalid value for S3 header: %s' % value)
     return 'x-amz-meta-%s' % value.lower()
+
+
+def dirpath(path):
+    if os.path.isdir(path):
+        return path
+    return os.path.split(path)[0]
+
+
+def dirname(path):
+    return os.path.basename(dir(path))

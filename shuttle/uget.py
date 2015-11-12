@@ -25,6 +25,8 @@ class RateSampler(object):
         self.rate = None
         self.reset = True
         self.period = period
+        self.start = None
+        self.counter = None
 
     def __enter__(self):
         if self.reset:
@@ -32,7 +34,7 @@ class RateSampler(object):
             self.start = time.time()
             self.counter = 0
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, exc_value, traceback):
         elapsed = time.time() - self.start
         if elapsed >= self.period:
             self.reset = True

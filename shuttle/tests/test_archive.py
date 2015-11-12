@@ -7,7 +7,7 @@ import pytest
 
 from ..archive_writer import ArchiveWriter
 from ..archive_reader import ArchiveReader
-from ..default import *
+from ..default import ARCHIVE_FILENAME, META_FILENAME
 
 
 def path_content(path, base_path=None):
@@ -80,8 +80,8 @@ def test_create_and_extract(tmp_path, tmp_path2, sample_package_path):
 
             assert os.stat(package_path).st_size == os.stat(extract_path).st_size
 
-            assert hashlib.sha256(io.open(package_path, 'rb').read()).hexdigest() == \
-                   hashlib.sha256(io.open(extract_path, 'rb').read()).hexdigest()
+            assert hashlib.md5(io.open(package_path, 'rb').read()).hexdigest() == \
+                   hashlib.md5(io.open(extract_path, 'rb').read()).hexdigest()
 
 
 def test_create_with_index(tmp_path, sample_package_path):
@@ -127,4 +127,4 @@ def test_create_abspath_without_base_path(tmp_path, sample_package_path):
 
     with ArchiveWriter(archive_path) as f:
         with pytest.raises(Exception):
-           f.add_path(sample_package_path)
+            f.add_path(sample_package_path)

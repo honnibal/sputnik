@@ -21,8 +21,8 @@ class Session(Base):
 
         self.cookie_jar = MozillaCookieJar(os.path.join(data_path, default.COOKIES_FILENAME))
         try:
-            cookie_jar.load()
-        except Exception:
+            self.cookie_jar.load()
+        except EnvironmentError:
             pass
 
         self.opener = build_opener(
@@ -52,7 +52,8 @@ class Session(Base):
         return codecs.getreader(charset)(r)
 
     def __del__(self):
-        hasattr(self, 'cookie_jar') and self.cookie_jar.save()
+        if hasattr(self, 'cookie_jar'):
+            self.cookie_jar.save()
 
 
 class GetRequest(Request):
