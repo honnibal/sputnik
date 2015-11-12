@@ -13,7 +13,7 @@ def test_build_install_remove(command, sample_package_path, tmp_path):
 
     packages = command.list()
     assert len(packages) == 1
-    assert packages[0].package_name() == package.package_name()
+    assert packages[0].ident == package.ident
 
     command.remove(package.name)
     assert not os.path.isdir(package.path)

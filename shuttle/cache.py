@@ -20,16 +20,15 @@ class PackageNotCompatibleException(Exception): pass
 
 
 class CachedPackage(PackageStub):
-    keys = PackageStub.keys + ['cache_id', 'path']
+    keys = PackageStub.keys + ['path']
 
     def __init__(self, meta, **kwargs):
         super(CachedPackage, self).__init__(meta['package'], **kwargs)
 
         self.data_path = kwargs.pop('data_path')
         self.meta = meta
-        self.path = os.path.join(self.data_path, default.CACHE_DIRNAME,
-                                 self.package_name())
-        self.cache_id = os.path.basename(self.path)
+        self.path = os.path.join(self.data_path,
+                                 default.CACHE_DIRNAME, self.ident)
 
         assert os.path.isfile(os.path.join(self.path, default.META_FILENAME))
 
@@ -91,10 +90,7 @@ class Cache(Base):
     def load(self):
         self._packages = {}
         for package in self.packages():
-            self._packages[package.cache_id] = package
-
-    def get_by_id(self, cache_id):
-        return self._packages[cache_id]
+            self._packages[package.ident] = package
 
     def get(self, package_string):
         candidates = []

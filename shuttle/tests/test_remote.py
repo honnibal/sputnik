@@ -13,7 +13,7 @@ def test_install_package(command):
 
     packages = command.list()
     assert len(packages) == 1
-    assert packages[0].package_name() == package.package_name()
+    assert packages[0].ident == package.ident
 
 
 @pytest.mark.remote
@@ -29,8 +29,8 @@ def test_upgrade_package(command):
 
     packages = command.list()
     assert len(packages) == 2
-    assert set([p.package_name() for p in packages]) == \
-           set([package1.package_name(), package2.package_name()])
+    assert set([p.ident for p in packages]) == \
+           set([package1.ident, package2.ident])
 
 
 @pytest.mark.remote

@@ -52,7 +52,7 @@ class Command(Base):
 
         cache = Cache(self.data_path, s=self.s)
         packages = cache.list()
-        util.json_print(self.s.log, [p.package_name() for p in packages])
+        util.json_print(self.s.log, [p.ident for p in packages])
         return packages
 
     def list(self, package_string=default.list_package_string, meta=default.list_meta):
@@ -83,7 +83,7 @@ class Command(Base):
     def files(self, package_string):
         package = Package.get(package_string, self.data_path, s=self.s)
         files = {f['path']: {'checksum': f['checksum'], 'size': f['size']} for f in package.manifest}
-        util.json_print(self.s.log, {package.package_name(): files})
+        util.json_print(self.s.log, {package.ident: files})
         return files
 
     def purge(self, cache=False, packages=False):

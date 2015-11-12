@@ -74,6 +74,6 @@ class Index(Base):
             meta = json.load(response)
 
             package = PackageStub(meta['package'], s=self.s)
-            assert name == package.package_name()
+            assert name == package.ident
 
             cache.update(meta, url=url)

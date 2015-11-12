@@ -62,9 +62,9 @@ class Archive(PackageStub):
 
     def fileobjs(self):
         return {
-            os.path.join(self.package_name(), default.META_FILENAME):
+            os.path.join(self.ident, default.META_FILENAME):
                 io.BytesIO(util.json_dump(self.archive.meta)),
-            os.path.join(self.package_name(), default.ARCHIVE_FILENAME):
+            os.path.join(self.ident, default.ARCHIVE_FILENAME):
                 self.archive.archive
         }
 

@@ -16,14 +16,17 @@ class PackageStub(Base):
 
         super(PackageStub, self).__init__(**kwargs)
 
-    def package_name(self):
-        return '%s-%s' % (self.name, self.version)
+    def is_valid(self, raise_exception=False):
+        res = False
+        if self.name and self.version:
+            res = True
 
-    def is_valid(self):
-        pass
+        if raise_exception and not res:
+            raise Exception('invalid package')
+        return res
 
     def is_compatible(self):
-        if self.s.name:
+        if self.s.name and self.compatibility:
             compatible_version = self.compatibility.get(self.s.name)
             if not compatible_version:
                 return False
@@ -36,4 +39,5 @@ class PackageStub(Base):
 
     @property
     def ident(self):
-        return '%s-%s' % (self.name, self.version)
+        if self.is_valid(True):
+            return '%s-%s' % (self.name, self.version)
