@@ -1,13 +1,10 @@
 {
   "name": "test",
   "description": "test package",
-  "model": "test",
-  "dependencies": [],
   "include": ["data/*"],
-  "languages": ["en"],
-  "version": "1.0.0",
+  "version": "2.0.0",
   "license": "public domain",
   "compatibility": {
-    "spacy": "==0.94.0"
+    "spacy": "==0.95.0"
   }
 }
