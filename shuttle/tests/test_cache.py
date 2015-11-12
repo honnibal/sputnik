@@ -30,6 +30,30 @@ def test_update(tmp_path):
     assert cache.get('xyz') is None
 
 
+def test_remove(tmp_path):
+    s = Shuttle('test', '1.0.0')
+    cache = Cache(tmp_path, s=s)
+    package = PackageStub({'name': 'abc', 'version': '1.0.0'}, s=s)
+
+    meta = {
+        'archive': ['archive.gz', None],
+        'package': package.to_dict()
+    }
+
+    assert len(cache.list()) == 0
+
+    cache.update(meta, None)
+
+    assert len(cache.list()) == 1
+    assert cache.list()[0].ident == package.ident
+
+    package = cache.get('abc')
+    package.remove()
+
+    assert len(cache.list()) == 0
+    assert cache.get('abc') is None
+
+
 def test_update_compatible(tmp_path):
     s = Shuttle('test', '1.0.0')
     cache = Cache(tmp_path, s=s)

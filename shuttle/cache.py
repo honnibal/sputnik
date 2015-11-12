@@ -22,11 +22,12 @@ class PackageNotCompatibleException(Exception): pass
 class CachedPackage(PackageStub):
     keys = PackageStub.keys + ['path']
 
-    def __init__(self, meta, **kwargs):
+    def __init__(self, meta, cache, **kwargs):
         super(CachedPackage, self).__init__(meta['package'], **kwargs)
 
-        self.data_path = kwargs.pop('data_path')
+        self.data_path = cache.data_path
         self.meta = meta
+        self.cache = cache
         self.path = os.path.join(self.data_path,
                                  default.CACHE_DIRNAME, self.ident)
 
@@ -64,6 +65,8 @@ class CachedPackage(PackageStub):
             shutil.move(self.path, tmp)
             shutil.rmtree(tmp)
 
+        self.cache.load()
+
 
 class Cache(Base):
     def __init__(self, data_path, **kwargs):
@@ -85,7 +88,7 @@ class Cache(Base):
                 continue
 
             meta = util.json_load(meta_path)
-            yield CachedPackage(meta, data_path=self.data_path, s=self.s)
+            yield CachedPackage(meta, self, s=self.s)
 
     def load(self):
         self._packages = {}
