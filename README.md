@@ -45,7 +45,7 @@ print(package.path)
 
 ## List installed packages
 
-This should output the package strings for all installed packages, e.g., ```[test-1.0.0]```:
+This should output the package strings for all installed packages, e.g., ```['test-1.0.0']```:
 
 ```
 command = sputnik.make_command(data_path='packages')
