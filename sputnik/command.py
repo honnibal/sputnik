@@ -12,10 +12,7 @@ from .cache import Cache
 
 
 class Command(Base):
-    def __init__(self, data_path, repository_url=None, **kwargs):
-        if data_path and not validation.is_data_path(data_path):
-            raise Exception("%r must be a directory" % data_path)
-
+    def __init__(self, data_path=None, repository_url=None, **kwargs):
         self.data_path = data_path
         self.repository_url = repository_url
 
@@ -50,7 +47,7 @@ class Command(Base):
         index.update()
 
         cache = Cache(self.data_path, s=self.s)
-        packages = cache.list()
+        packages = cache.list(search_string)
         util.json_print(self.s.log, [p.ident for p in packages])
         return packages
 

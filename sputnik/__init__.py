@@ -8,7 +8,7 @@ from .command import Command
 
 
 class Sputnik(object):
-    def __init__(self, name, version, console=None):
+    def __init__(self, name=None, version=None, console=None):
         self.name = name
         if version:
             semver.parse(version)  # raises ValueError when invalid

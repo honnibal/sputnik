@@ -6,6 +6,13 @@ from .. import Sputnik
 from ..archive import PackageNotCompatibleException
 
 
+def test_build(sample_package_path):
+    sputnik = Sputnik()
+    command = sputnik.make_command()
+    archive = command.build(sample_package_path)
+    assert os.path.isfile(archive.path)
+
+
 def test_build_install_remove(command, sample_package_path, tmp_path):
     archive = command.build(sample_package_path)
     assert os.path.isfile(archive.path)
