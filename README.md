@@ -71,6 +71,8 @@ package.file_path('data/model')
 
 returns a string with the path to the file.
 
+If you want to list all file contents of a package use ```command.files('test')```.
+
 ## Remove package
 
 ```
