@@ -1,5 +1,5 @@
-[![Travis CI](https://travis-ci.org/henningpeters/shuttle.svg?branch=master)](https://travis-ci.org/henningpeters/shuttle)
+[![Travis CI](https://travis-ci.org/henningpeters/sputnik.svg?branch=master)](https://travis-ci.org/henningpeters/sputnik)
 
-# Shuttle
+# Sputnik
 
 A data package manager

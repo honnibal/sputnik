@@ -1,6 +1,6 @@
 import sys
 
-from shuttle import cli
+from sputnik import cli
 
 
 if __name__ == "__main__":

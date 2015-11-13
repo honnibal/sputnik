@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from .. import Shuttle
+from .. import Sputnik
 from ..archive import PackageNotCompatibleException
 
 
@@ -28,7 +28,7 @@ def test_build_install_remove(command, sample_package_path, tmp_path):
 
 
 def test_install_incompatible(sample_package_path, sample_package_path2, tmp_path):
-    s = Shuttle('test', '1.0.0')
+    s = Sputnik('test', '1.0.0')
     command = s.make_command(
         data_path=tmp_path,
         repository_url=os.environ.get('REPOSITORY_URL'))
@@ -46,7 +46,7 @@ def test_install_incompatible(sample_package_path, sample_package_path2, tmp_pat
 
 
 def test_install_upgrade(sample_package_path, sample_package_path2, tmp_path):
-    s = Shuttle('test', '1.0.0')
+    s = Sputnik('test', '1.0.0')
     command = s.make_command(
         data_path=tmp_path,
         repository_url=os.environ.get('REPOSITORY_URL'))
@@ -54,7 +54,7 @@ def test_install_upgrade(sample_package_path, sample_package_path2, tmp_path):
     archive = command.build(sample_package_path)
     package = command.install(archive.path)
 
-    s = Shuttle('test', '2.0.0')
+    s = Sputnik('test', '2.0.0')
     command = s.make_command(
         data_path=tmp_path,
         repository_url=os.environ.get('REPOSITORY_URL'))

@@ -4,7 +4,7 @@ import argparse
 from . import command
 from . import validation
 from . import default
-from . import Shuttle
+from . import Sputnik
 
 
 def package_path_type(path):
@@ -14,7 +14,7 @@ def package_path_type(path):
 
 
 def make_command(args):
-    s = Shuttle(name=args.name,
+    s = Sputnik(name=args.name,
                 version=args.version,
                 console=sys.stdout)
     return s.make_command(

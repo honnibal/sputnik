@@ -6,7 +6,7 @@ import tempfile
 import pytest
 
 from .. import util
-from .. import Shuttle
+from .. import Sputnik
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def sample_package_path2():
 
 @pytest.fixture
 def command(tmp_path):
-    s = Shuttle(None, None)
+    s = Sputnik(None, None)
     return s.make_command(
         data_path=tmp_path,
         repository_url=os.environ.get('REPOSITORY_URL'))

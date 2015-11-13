@@ -1,12 +1,12 @@
 import os
 
-from .. import Shuttle
+from .. import Sputnik
 from ..package import PackageRecipe
 from ..archive import Archive
 
 
 def test_build_and_check_archive(tmp_path, sample_package_path):
-    s = Shuttle('test', '1.0.0')
+    s = Sputnik('test', '1.0.0')
     recipe = PackageRecipe(sample_package_path, s=s)
     archive1 = recipe.build(tmp_path)
 
@@ -19,17 +19,17 @@ def test_build_and_check_archive(tmp_path, sample_package_path):
 
 
 def test_archive_is_compatible(tmp_path, sample_package_path):
-    s = Shuttle('test', '1.0.0')
+    s = Sputnik('test', '1.0.0')
     recipe = PackageRecipe(sample_package_path, s=s)
     archive = recipe.build(tmp_path)
     assert archive.is_compatible()
 
-    s = Shuttle('test', '2.0.0')
+    s = Sputnik('test', '2.0.0')
     recipe = PackageRecipe(sample_package_path, s=s)
     archive = recipe.build(tmp_path)
     assert not archive.is_compatible()
 
-    s = Shuttle('xxx', '1.0.0')
+    s = Sputnik('xxx', '1.0.0')
     recipe = PackageRecipe(sample_package_path, s=s)
     archive = recipe.build(tmp_path)
     assert not archive.is_compatible()

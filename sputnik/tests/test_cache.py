@@ -1,6 +1,6 @@
 import pytest
 
-from .. import Shuttle
+from .. import Sputnik
 from ..cache import Cache
 from ..package_stub import PackageStub
 from ..package_list import CompatiblePackageNotFoundException, \
@@ -8,7 +8,7 @@ from ..package_list import CompatiblePackageNotFoundException, \
 
 
 def test_update(tmp_path):
-    s = Shuttle('test', '1.0.0')
+    s = Sputnik('test', '1.0.0')
     cache = Cache(tmp_path, s=s)
     package = PackageStub({'name': 'abc', 'version': '1.0.0'}, s=s)
 
@@ -36,7 +36,7 @@ def test_update(tmp_path):
 
 
 def test_remove(tmp_path):
-    s = Shuttle('test', '1.0.0')
+    s = Sputnik('test', '1.0.0')
     cache = Cache(tmp_path, s=s)
     package = PackageStub({'name': 'abc', 'version': '1.0.0'}, s=s)
 
@@ -62,7 +62,7 @@ def test_remove(tmp_path):
 
 
 def test_update_compatible(tmp_path):
-    s = Shuttle('test', '1.0.0')
+    s = Sputnik('test', '1.0.0')
     cache = Cache(tmp_path, s=s)
     package = PackageStub({
         'name': 'abc',
@@ -95,7 +95,7 @@ def test_update_compatible(tmp_path):
 
 
 def test_update_incompatible(tmp_path):
-    s = Shuttle('test', '1.0.0')
+    s = Sputnik('test', '1.0.0')
     cache = Cache(tmp_path, s=s)
     package = PackageStub({
         'name': 'abc',
@@ -125,7 +125,7 @@ def test_update_incompatible(tmp_path):
 
 
 def test_update_multiple_compatible(tmp_path):
-    s = Shuttle('test', '5.0.0')
+    s = Sputnik('test', '5.0.0')
     cache = Cache(tmp_path, s=s)
 
     for i in range(1, 11):
@@ -152,7 +152,7 @@ def test_update_multiple_compatible(tmp_path):
 
 
 def test_update_multiple_incompatible(tmp_path):
-    s = Shuttle('test', '0.0.0')
+    s = Sputnik('test', '0.0.0')
     cache = Cache(tmp_path, s=s)
 
     for i in range(1, 11):

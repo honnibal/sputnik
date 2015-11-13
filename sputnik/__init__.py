@@ -7,7 +7,7 @@ import semver
 from .command import Command
 
 
-class Shuttle(object):
+class Sputnik(object):
     def __init__(self, name, version, console=None):
         self.name = name
         if version:
@@ -22,7 +22,7 @@ class Shuttle(object):
     def user_agent(self):
         uname = platform.uname()
         user_agent_vars = [
-            ('Shuttle', '1.0.0'),
+            ('Sputnik', '1.0.0'),
             (self.name, self.version),
             (platform.python_implementation(), platform.python_version()),
             (platform.uname()[0], uname[2]),

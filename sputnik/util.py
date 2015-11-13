@@ -15,7 +15,7 @@ def is_enough_space(path, size):
 def archive_filename(name, version, suffix=False):
     res = "%s-%s" % (name, version)
     if suffix:
-        res += ".shuttle"
+        res += ".sputnik"
     return res
 
 
