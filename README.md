@@ -58,14 +58,16 @@ print([p.ident for p in packages])
 Sputnik makes it easy to access packaged data files without dealing with filesystem paths or archive file formats.
 
 ```
-model = command.file('test', 'data/model')
+command.file('test', 'data/model')
 ```
 
-or in case you already hold a package object:
+returns a file object. Or in case you already hold a package object:
 
 ```
-model = package.file_path('data/model')
+package.file_path('data/model')
 ```
+
+returns a string with the path to the file.
 
 ## Remove package
 
