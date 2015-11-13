@@ -6,7 +6,7 @@ Sputnik is a library for managing data packages for another library, e.g., model
 
 It also comes with a command-line interface.
 
-It's a pure Python library licensed under MIT, has minimal dependencies (only ```semver```) and is tested against Python >=2.7 and >=3.2.
+It's a pure Python library licensed under MIT, has minimal dependencies (only ```semver```) and is tested against ```python >=2.7``` and ```python >=3.2```.
 
 ## Build a package
 
