@@ -9,6 +9,9 @@ from .archive_writer import ArchiveWriter
 from .archive_reader import ArchiveReader
 
 
+class PackageNotCompatibleException(Exception): pass
+
+
 class NewArchive(PackageStub):  # package archive
     def __init__(self, recipe, path, hash_func, **kwargs):
         self.hash_func = hash_func
@@ -69,6 +72,11 @@ class Archive(PackageStub):
         }
 
     def install(self, data_path):
+        if not self.is_compatible():
+            raise PackageNotCompatibleException(
+                'running %s %s but requires %s' %
+                (self.s.name, self.s.version, self.compatibility))
+
         archive_name = util.archive_filename(self.name, self.version)
         dest_dir = os.path.join(data_path, archive_name)
 

@@ -1,8 +1,10 @@
 import pytest
 
 from .. import Shuttle
-from ..cache import Cache, PackageNotCompatibleException
+from ..cache import Cache
 from ..package_stub import PackageStub
+from ..package_list import CompatiblePackageNotFoundException, \
+                           PackageNotFoundException
 
 
 def test_update(tmp_path):
@@ -22,12 +24,15 @@ def test_update(tmp_path):
     assert len(cache.list()) == 1
     assert cache.list()[0].ident == package.ident
 
-    assert cache.get('abc >=1.0.1') is None
+    with pytest.raises(PackageNotFoundException):
+        assert cache.get('abc >=1.0.1')
+
     assert cache.get('abc').ident == package.ident
     assert cache.get('abc ==1.0.0').ident == package.ident
     assert cache.get('abc >0.0.1').ident == package.ident
 
-    assert cache.get('xyz') is None
+    with pytest.raises(PackageNotFoundException):
+        assert cache.get('xyz')
 
 
 def test_remove(tmp_path):
@@ -51,7 +56,9 @@ def test_remove(tmp_path):
     package.remove()
 
     assert len(cache.list()) == 0
-    assert cache.get('abc') is None
+
+    with pytest.raises(PackageNotFoundException):
+        assert cache.get('abc')
 
 
 def test_update_compatible(tmp_path):
@@ -76,12 +83,15 @@ def test_update_compatible(tmp_path):
 
     assert len(cache.list()) == 1
 
-    assert cache.get('abc >=1.0.1') is None
+    with pytest.raises(PackageNotFoundException):
+        assert cache.get('abc >=1.0.1')
+
     assert cache.get('abc').ident == package.ident
     assert cache.get('abc ==1.0.0').ident == package.ident
     assert cache.get('abc >0.0.1').ident == package.ident
 
-    assert cache.get('xyz') is None
+    with pytest.raises(PackageNotFoundException):
+        assert cache.get('xyz')
 
 
 def test_update_incompatible(tmp_path):
@@ -106,11 +116,12 @@ def test_update_incompatible(tmp_path):
 
     assert len(cache.list()) == 0
 
-    with pytest.raises(PackageNotCompatibleException):
+    with pytest.raises(CompatiblePackageNotFoundException):
         cache.get('abc')
         cache.get('abc >=0.0.0')
 
-    assert cache.get('xyz') is None
+    with pytest.raises(PackageNotFoundException):
+        assert cache.get('xyz')
 
 
 def test_update_multiple_compatible(tmp_path):
@@ -136,7 +147,8 @@ def test_update_multiple_compatible(tmp_path):
     assert len(cache.list()) == 5
     assert cache.get('abc').version == '5.0.0'
 
-    assert cache.get('xyz') is None
+    with pytest.raises(PackageNotFoundException):
+        assert cache.get('xyz')
 
 
 def test_update_multiple_incompatible(tmp_path):
@@ -161,8 +173,9 @@ def test_update_multiple_incompatible(tmp_path):
 
     assert len(cache.list()) == 0
 
-    with pytest.raises(PackageNotCompatibleException):
+    with pytest.raises(CompatiblePackageNotFoundException):
         cache.get('abc')
         cache.get('abc >=0.0.0')
 
-    assert cache.get('xyz') is None
+    with pytest.raises(PackageNotFoundException):
+        assert cache.get('xyz')

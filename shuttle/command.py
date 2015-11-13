@@ -5,7 +5,7 @@ from . import validation
 from . import default
 from . import util
 from .archive import Archive
-from .package import Package, PackageRecipe
+from .package import Package, PackageRecipe, Pool
 from .index import Index
 from .base import Base
 from .cache import Cache
@@ -33,16 +33,15 @@ class Command(Base):
             archive = package.fetch()
 
         path = archive.install(self.data_path)
-        return Package(path, s=self.s)
+        return Package(path=path, s=self.s)
 
     def build(self, package_path=default.build_package_path):
         recipe = PackageRecipe(package_path, s=self.s)
         return recipe.build(package_path)
 
     def remove(self, package_string):
-        packages = Package.find(data_path=self.data_path,
-                                s=self.s,
-                                package_string=package_string)
+        pool = Pool(self.data_path, s=self.s)
+        packages = pool.list(package_string)
         for package in packages:
             package.remove()
 
@@ -56,12 +55,9 @@ class Command(Base):
         return packages
 
     def list(self, package_string=default.list_package_string, meta=default.list_meta):
-        packages = Package.find(package_string=package_string,
-                                data_path=self.data_path, s=self.s)
-
         # TODO add cli option to list cache
-        # packages = Cache(data_path=self.data_path, s=self.s).list()
-
+        pool = Pool(self.data_path, s=self.s)
+        packages = pool.list(package_string)
         keys = not meta and ('name', 'version') or ()
         util.json_print(self.s.log, [p.to_dict(keys) for p in packages])
         return packages
@@ -75,13 +71,15 @@ class Command(Base):
         index.update()
 
     def file(self, package_string, path):
-        package = Package.get(package_string, self.data_path, s=self.s)
+        pool = Pool(self.data_path, s=self.s)
+        package = pool.get(package_string)
         file_path = package.file_path(path)
         util.json_print(self.s.log, file_path)
         return io.open(file_path, 'rb')
 
     def files(self, package_string):
-        package = Package.get(package_string, self.data_path, s=self.s)
+        pool = Pool(self.data_path, s=self.s)
+        package = pool.get(package_string)
         files = {f['path']: {'checksum': f['checksum'], 'size': f['size']} for f in package.manifest}
         util.json_print(self.s.log, {package.ident: files})
         return files
@@ -89,9 +87,9 @@ class Command(Base):
     def purge(self, cache=False, packages=False):
         if cache:
             self.s.log('purging cache')
-            for package in Cache(data_path=self.data_path, s=self.s).list():
+            for package in Cache(self.data_path, s=self.s).list():
                 package.remove()
         if packages:
             self.s.log('purging packages')
-            for package in Package.find(data_path=self.data_path, s=self.s):
+            for package in Pool(self.data_path, s=self.s).list():
                 package.remove()

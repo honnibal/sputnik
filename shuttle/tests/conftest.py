@@ -20,20 +20,17 @@ def tmp_path2():
 
 
 @pytest.fixture(scope='module')
-def sample_package_path():
+def sample_package_path(version='1.0.0', compat_version='==1.0.0'):
     path = tempfile.mkdtemp()
 
     with io.open(os.path.join(path, 'package.json'), 'wb') as f:
         f.write(util.json_dump({
             "name": "test",
             "description": "test package",
-            "model": "test",
-            "dependencies": [],
             "include": ["data/*"],
-            "languages": ["en"],
-            "version": "1.0.0",
+            "version": version,
             "license": "public domain",
-            "compatibility": {"test": "==1.0.0"}
+            "compatibility": {"test": compat_version}
         }))
     data_path = os.path.join(path, 'data')
     os.mkdir(data_path)
@@ -44,6 +41,11 @@ def sample_package_path():
         for i in range(1):
             f.write(('%s' % i) * 1024)
     return path
+
+
+@pytest.fixture(scope='module')
+def sample_package_path2():
+    return sample_package_path('2.0.0', '==2.0.0')
 
 
 @pytest.fixture
