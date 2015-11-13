@@ -14,7 +14,7 @@ Add a ```package.json``` file with following JSON to a directory ```test``` and 
 {
   "name": "test",
   "include": ["data/*"],
-  "version": "1.0.0",
+  "version": "1.0.0"
 }
 ```
 
