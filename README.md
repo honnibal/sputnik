@@ -122,7 +122,8 @@ command.install(archive.path)
 This should throw an exception as it requires version ```0.6.1``` of our library:
 
 ```
-PackageNotCompatibleException: running my_library 0.6.0 but requires {'my_library': '>=0.6.1'}
+sputnik.archive.PackageNotCompatibleException:
+running my_library 0.6.0 but requires {'my_library': '>=0.6.1'}
 ```
 
 Upgrading our library to version ```0.6.1```:
