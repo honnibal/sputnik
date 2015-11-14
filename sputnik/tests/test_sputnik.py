@@ -45,7 +45,7 @@ def test_install_incompatible(sample_package_path, sample_package_path2, tmp_pat
 
     archive2 = command.build(sample_package_path2)
     with pytest.raises(PackageNotCompatibleException):
-        package2 = command.install(archive2.path)
+        command.install(archive2.path)
 
     packages = command.list()
     assert len(packages) == 1
@@ -59,7 +59,7 @@ def test_install_upgrade(sample_package_path, sample_package_path2, tmp_path):
         repository_url=os.environ.get('REPOSITORY_URL'))
 
     archive = command.build(sample_package_path)
-    package = command.install(archive.path)
+    command.install(archive.path)
 
     s = Sputnik('test', '2.0.0')
     command = s.make_command(

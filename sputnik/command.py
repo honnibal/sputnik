@@ -1,7 +1,6 @@
 import os
 import io
 
-from . import validation
 from . import default
 from . import util
 from .archive import Archive
@@ -77,7 +76,8 @@ class Command(Base):
     def files(self, package_string):
         pool = Pool(self.data_path, s=self.s)
         package = pool.get(package_string)
-        files = {f['path']: {'checksum': f['checksum'], 'size': f['size']} for f in package.manifest}
+        files = {f['path']: {'checksum': f['checksum'], 'size': f['size']}
+                 for f in package.manifest}
         util.json_print(self.s.log, {package.ident: files})
         return files
 

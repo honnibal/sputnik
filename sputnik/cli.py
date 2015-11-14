@@ -1,7 +1,7 @@
+# pylint: disable=C0330
 import sys
 import argparse
 
-from . import command
 from . import validation
 from . import default
 from . import Sputnik

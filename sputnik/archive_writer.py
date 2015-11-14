@@ -1,7 +1,6 @@
 import gzip
 import io
 import os
-import json
 import tarfile
 import time
 import tempfile
