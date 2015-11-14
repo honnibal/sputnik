@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='sputnik',
-    version='0.1.1',
+    version='0.2.0',
     description='Sputnik data package manager library',
     url='https://github.com/henningpeters/sputnik',
     author='Henning Peters',
