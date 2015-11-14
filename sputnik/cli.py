@@ -194,11 +194,3 @@ def get_parser():
     add_purge_parser(subparsers)
 
     return parser
-
-
-def run(parser):
-    args = parser.parse_args(sys.argv[1:])
-    if hasattr(args, 'run'):
-        args.run(args)
-    else:
-        parser.print_usage()
