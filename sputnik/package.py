@@ -87,7 +87,8 @@ class PackageRecipe(Base):  # package.json recipe
 
             for include in self.include:
                 for path in glob(os.path.join(self.path, include)):
-                    archive.add_file(path)
+                    if os.path.isfile(path):
+                        archive.add_file(path)
             return archive
 
 
