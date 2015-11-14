@@ -4,9 +4,17 @@
 
 Sputnik is a library for managing data packages for another library, e.g., models for a machine learning library.
 
-It also comes with a command-line interface.
+It also comes with a command-line interface, run ```sputnik --help``` or ```python -m sputnik --help``` for assistance.
 
-It's a pure Python library licensed under MIT, has minimal dependencies (only ```semver```) and is tested against ```python ==2.7``` and ```python ==3.4```.
+Sputnik is a pure Python library licensed under MIT, has minimal dependencies (only ```semver```) and is tested against ```python ==2.7``` and ```python ==3.4```.
+
+## Installation
+
+Sputnik is available from [PyPI](https://pypi.python.org/pypi/sputnik) via ```pip```:
+
+```
+pip install sputnik
+```
 
 ## Build a package
 
