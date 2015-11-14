@@ -1,3 +1,4 @@
+import io
 import os
 from hashlib import md5
 import shutil
@@ -6,8 +7,8 @@ from glob import glob
 from . import util
 from . import validation
 from . import default
-from .archive import NewArchive
 from .base import Base
+from .new_archive import NewArchive
 from .package_string import PackageString
 from .package_stub import PackageStub
 from .package_list import PackageList
@@ -47,8 +48,9 @@ class Package(PackageStub):  # installed package
 
         # cleanup remove
         if os.path.exists(self.path):
-            self.s.log('remove %s' % self.path)
+            self.s.log('pending remove %s' % self.path)
             shutil.move(self.path, tmp)
+            self.s.log('remove %s' % self.path)
             shutil.rmtree(tmp)
 
 

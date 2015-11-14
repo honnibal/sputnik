@@ -61,8 +61,9 @@ class CachedPackage(PackageStub):
 
         # cleanup remove
         if os.path.exists(self.path):
-            self.s.log('remove %s' % self.path)
+            self.s.log('pending remove %s' % self.path)
             shutil.move(self.path, tmp)
+            self.s.log('remove %s' % self.path)
             shutil.rmtree(tmp)
 
         self.cache.load()

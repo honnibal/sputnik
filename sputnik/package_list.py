@@ -68,16 +68,28 @@ class PackageList(Base):
 
         return package
 
-    def list(self, package_string=None):
+    def list(self, package_string=None, check_compatibility=True):
+        def c(value):
+            if check_compatibility:
+                return value
+            return True
+
         if not package_string:
-            return [p for p in self._packages.values() if p.is_compatible()]
+            return [p for p in self._packages.values() if c(p.is_compatible())]
 
         candidates = []
         query = PackageString(package_string)
 
         for package in self._packages.values():
             ps = PackageString(package=package)
-            if query.match(ps) and ps.package.is_compatible():
+            if query.match(ps) and c(ps.package.is_compatible()):
                 candidates.append(ps.package)
 
         return candidates
+
+    def list_all(self, package_string=None):
+        return self.list(package_string, check_compatibility=False)
+
+    def purge(self):
+        for package in self.list():
+            package.remove()
