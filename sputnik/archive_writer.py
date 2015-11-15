@@ -11,6 +11,7 @@ from . import default
 
 
 class EmptyArchiveException(Exception): pass
+class InvalidPathException(Exception): pass
 
 
 class ArchiveWriter(object):
@@ -77,7 +78,7 @@ class ArchiveWriter(object):
 
     def add(self, path, cb=None):
         if self.base_path is None and os.path.isabs(path):
-            raise Exception('cannot handle absolute paths without base_path: %s' % path)
+            raise InvalidPathException('cannot handle absolute paths without base_path: %s' % path)
 
         checksum = self.hash_func()
 

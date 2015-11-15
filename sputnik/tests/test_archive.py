@@ -5,7 +5,7 @@ import io
 
 import pytest
 
-from ..archive_writer import ArchiveWriter
+from ..archive_writer import ArchiveWriter, InvalidPathException
 from ..archive_reader import ArchiveReader
 from ..default import ARCHIVE_FILENAME, META_FILENAME
 
@@ -125,6 +125,6 @@ def test_create_without_base_path(tmp_path, sample_package_path):
 def test_create_abspath_without_base_path(tmp_path, sample_package_path):
     archive_path = os.path.join(tmp_path, 'test.sputnik')
 
-    with ArchiveWriter(archive_path) as f:
-        with pytest.raises(Exception):
-            f.add_path(sample_package_path)
+    f = ArchiveWriter(archive_path)
+    with pytest.raises(InvalidPathException):
+        f.add_path(sample_package_path)
