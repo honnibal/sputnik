@@ -10,6 +10,9 @@ from . import util
 from . import default
 
 
+class EmptyArchiveException(Exception): pass
+
+
 class ArchiveWriter(object):
     def __init__(self, path, base_path=None, hash_func=hashlib.md5):
         if hasattr(hashlib, 'algorithms_available'):
@@ -26,7 +29,7 @@ class ArchiveWriter(object):
         self.tmp_path = tempfile.mkdtemp()
         self.tmp_archive_path = os.path.join(self.tmp_path, default.ARCHIVE_FILENAME)
         self.archive = io.open(self.tmp_archive_path, 'wb')
-        self.meta = {}
+        self.meta = {'manifest': []}
 
     def __del__(self):
         self.archive.close()
@@ -40,6 +43,9 @@ class ArchiveWriter(object):
         self.close()
 
     def close(self):
+        if not len(self.meta['manifest']):
+            raise EmptyArchiveException(self.path)
+
         mtime = time.time()
 
         with tarfile.open(self.path, 'w') as tar:
@@ -96,7 +102,6 @@ class ArchiveWriter(object):
 
             gz.flush()
 
-        self.meta['manifest'] = self.meta.get('manifest', [])
         self.meta['manifest'].append({
             'path': os.path.relpath(path, self.base_path or ''),
             'noffset': self.archive.tell(),

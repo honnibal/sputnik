@@ -1,10 +1,10 @@
 {
-  "name": "test",
-  "description": "test package",
+  "name": "my_model",
+  "description": "this model is awesome",
   "include": ["data/*"],
   "version": "2.0.0",
   "license": "public domain",
   "compatibility": {
-    "spacy": "==0.95.0"
+    "my_library": ">=0.6.1"
   }
 }
