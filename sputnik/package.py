@@ -29,11 +29,16 @@ class Package(PackageStub):  # installed package
         if not self.has_file(path):
             raise Exception('package does not include file: %s' % path)
 
-        file_path = os.path.join(self.path, path)
-        if not os.path.isfile(file_path):
-            raise Exception('file not found: %s' % path)
+        res = os.path.join(self.path, path)
+        if not os.path.isfile(res):
+            raise Exception('file not found: %s' % res)
+        return res
 
-        return file_path
+    def dir_path(self, path):
+        res = os.path.join(self.path, path)
+        if not os.path.isdir(res):
+            raise Exception('file not found: %s' % res)
+        return res
 
     @property
     def manifest(self):
@@ -83,7 +88,8 @@ class PackageRecipe(Base):  # package.json recipe
             raise Exception("missing include")
 
     def build(self, archive_path):
-        with NewArchive(self, archive_path, md5, s=self.s) as archive:
+        with NewArchive(self, archive_path, md5,
+                        base_path=self.path, s=self.s) as archive:
             self.s.log("build %s" % archive.path)
 
             for include in self.include:

@@ -156,16 +156,16 @@ def add_purge_parser(subparsers):
     parser.add_argument('--cache',
         default=False,
         action='store_true',
-        help='purge cache')
-    parser.add_argument('--packages',
+        help='purge cache (cached packages)')
+    parser.add_argument('--pool',
         default=False,
         action='store_true',
-        help='purge installed packages')
+        help='purge pool (installed packages)')
 
     def run(args):
         c = make_command(args)
         c.purge(cache=args.cache,
-                packages=args.packages)
+                pool=args.pool)
 
     parser.set_defaults(run=run)
 

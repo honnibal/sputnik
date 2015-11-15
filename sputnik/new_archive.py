@@ -12,11 +12,12 @@ class NewArchive(PackageStub):  # package archive
         filename = util.archive_filename(
             recipe.name, recipe.version, suffix=True)
         self.path = os.path.join(path, filename)
+        self.base_path = kwargs.pop('base_path', path)
 
         super(NewArchive, self).__init__(recipe.to_dict(), **kwargs)
 
     def __enter__(self):
-        self.archive = ArchiveWriter(self.path, base_path=os.path.dirname(self.path))
+        self.archive = ArchiveWriter(self.path, base_path=self.base_path)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
