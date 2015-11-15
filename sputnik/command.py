@@ -4,7 +4,8 @@ import io
 from . import default
 from . import util
 from .archive import Archive
-from .package import Package, PackageRecipe, Pool
+from .pool import Pool
+from .package import Package, PackageRecipe
 from .index import Index
 from .base import Base
 from .cache import Cache
@@ -28,7 +29,8 @@ class Command(Base):
             package = cache.get(package_name)
             archive = package.fetch()
 
-        path = archive.install(self.data_path)
+        pool = Pool(self.data_path, s=self.s)
+        path = archive.install(pool)
         return Package(path=path, s=self.s)
 
     def build(self, package_path=default.build_package_path):
@@ -37,6 +39,7 @@ class Command(Base):
 
     def remove(self, package_string):
         pool = Pool(self.data_path, s=self.s)
+        pool.cleanup()
         packages = pool.list(package_string)
         for package in packages:
             package.remove()
@@ -88,4 +91,6 @@ class Command(Base):
 
         if packages or not cache and not packages:
             self.s.log('purging packages')
-            Pool(self.data_path, s=self.s).purge()
+            pool = Pool(self.data_path, s=self.s)
+            pool.cleanup()
+            pool.purge()

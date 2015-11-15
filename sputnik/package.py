@@ -11,7 +11,6 @@ from .base import Base
 from .new_archive import NewArchive
 from .package_string import PackageString
 from .package_stub import PackageStub
-from .package_list import PackageList
 
 
 class Package(PackageStub):  # installed package
@@ -92,8 +91,3 @@ class PackageRecipe(Base):  # package.json recipe
                     if os.path.isfile(path):
                         archive.add_file(path)
             return archive
-
-
-class Pool(PackageList):
-
-    package_class = Package

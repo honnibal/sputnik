@@ -1,5 +1,6 @@
 import semver
 
+from . import util
 from .base import Base
 
 
@@ -40,4 +41,4 @@ class PackageStub(Base):
     @property
     def ident(self):
         if self.is_valid(True):
-            return '%s-%s' % (self.name, self.version)
+            return util.archive_filename(self.name, self.version)

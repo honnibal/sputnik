@@ -27,6 +27,8 @@ class PackageList(Base):
             os.mkdir(self.path)
 
         for path in os.listdir(self.path):
+            if path.endswith('.install') or path.endswith('.remove'):
+                continue
 
             meta_path = os.path.join(self.path, path, default.META_FILENAME)
             if not os.path.isfile(meta_path):
@@ -93,3 +95,6 @@ class PackageList(Base):
     def purge(self):
         for package in self.list():
             package.remove()
+
+        if not os.listdir(self.path):
+            os.rmdir(self.path)
