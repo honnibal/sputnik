@@ -1,4 +1,3 @@
-import os
 import sys
 import platform
 
@@ -25,7 +24,7 @@ class Sputnik(object):
     def user_agent(self):
         uname = platform.uname()
         user_agent_vars = [
-            ('Sputnik', '1.0.0'),
+            ('Sputnik', version),
             (self.name, self.version),
             (platform.python_implementation(), platform.python_version()),
             (platform.uname()[0], uname[2]),
