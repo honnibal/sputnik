@@ -7,6 +7,9 @@ import semver
 from .command import Command
 
 
+version = '0.3.0'
+
+
 class Sputnik(object):
     def __init__(self, name=None, version=None, console=None):
         self.name = name
