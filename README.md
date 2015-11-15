@@ -18,11 +18,11 @@ pip install sputnik
 
 ## Build a package
 
-Add a ```package.json``` file with following JSON to a directory ```test``` and add some files in ```test/data``` that you would like to have packaged, e.g., ```test/data/model```.
+Add a ```package.json``` file with following JSON to a directory ```sample``` and add some files in ```sample/data``` that you would like to have packaged, e.g., ```sample/data/model```. See a sample layout [here](https://github.com/henningpeters/sputnik/tree/master/sample).
 
 ```
 {
-  "name": "test",
+  "name": "my_model",
   "include": ["data/*"],
   "version": "1.0.0"
 }
@@ -35,27 +35,27 @@ from sputnik import Sputnik
 sputnik = Sputnik()
 ```
 
-Then build the package with following code, it should produce a new file and output its path: ```test/test-1.0.0.sputnik```.
+Then build the package with following code, it should produce a new file and output its path: ```sample/my_model-1.0.0.sputnik```.
 
 ```
 command = sputnik.make_command()
-archive = command.build('test')
+archive = command.build('sample')
 print(archive.path)
 ```
 
 ## Install a package
 
-Decide for a location for your installed packages, e.g., ```packages```. Then install the previously built package with following code, it should output the path of the now installed package: ```repository/test-1.0.0```
+Decide for a location for your installed packages, e.g., ```packages```. Then install the previously built package with following code, it should output the path of the now installed package: ```packages/my_model-1.0.0```
 
 ```
 command = sputnik.make_command(data_path='packages')
-package = command.install('test/test-1.0.0.sputnik')
+package = command.install('sample/my_model-1.0.0.sputnik')
 print(package.path)
 ```
 
 ## List installed packages
 
-This should output the package strings for all installed packages, e.g., ```['test-1.0.0']```:
+This should output the package strings for all installed packages, e.g., ```['my_model-1.0.0']```:
 
 ```
 command = sputnik.make_command(data_path='packages')
@@ -68,7 +68,7 @@ print([p.ident for p in packages])
 Sputnik makes it easy to access packaged data files without dealing with filesystem paths or archive file formats.
 
 ```
-command.file('test', 'data/model')
+command.file('my_model', 'data/model')
 ```
 
 returns a file object. Or in case you already hold a package object:
@@ -79,12 +79,12 @@ package.file_path('data/model')
 
 returns a string with the path to the file.
 
-If you want to list all file contents of a package use ```command.files('test')```.
+If you want to list all file contents of a package use ```command.files('my_model')```.
 
 ## Remove package
 
 ```
-command.remove('test')
+command.remove('my_model')
 ```
 
 ## Versioning
@@ -92,11 +92,11 @@ command.remove('test')
 ```install```, ```list```, ```file```, ```files```, ```search``` and ```remove``` commands accept version strings that follow [semantic versioning](http://semver.org/), e.g.:
 
 ```
-command.install('test ==1.0.0')
-command.list('test >1.0.0')
-command.file('test >=1.0.0')
-command.files('test <1.0.0')
-command.remove('test <=1.0.0')
+command.install('my_model ==1.0.0')
+command.list('my_model >1.0.0')
+command.file('my_model >=1.0.0')
+command.files('my_model <1.0.0')
+command.remove('my_model <=1.0.0')
 ```
 
 ## Compatibility
