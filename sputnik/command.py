@@ -84,10 +84,10 @@ class Command(Base):
         return files
 
     def purge(self, cache=False, pool=False):
-        if cache or not cache and not packages:
+        if cache or not cache and not pool:
             self.s.log('purging cache')
             Cache(self.data_path, s=self.s).purge()
 
-        if packages or not cache and not packages:
+        if pool or not cache and not pool:
             self.s.log('purging pool')
             Pool(self.data_path, s=self.s).purge()
