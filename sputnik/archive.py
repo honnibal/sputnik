@@ -45,18 +45,8 @@ class Archive(PackageStub):
         archive_name = util.archive_filename(self.name, self.version)
         path = os.path.join(pool.path, archive_name)
 
-        pool.cleanup()
+        self.s.log('install %s' % os.path.basename(path))
+        self.archive.extract_all(path + '.tmp')
+        os.rename(path + '.tmp', path)
 
-        # tmp install
-        tmp_path = path + ".install"
-        self.s.log('pending install %s' % os.path.basename(tmp_path))
-        self.archive.extract_all(tmp_path)
-
-        # make way
-        if os.path.exists(path):
-            tmp_path = path + ".remove"
-            self.s.log('pending remove %s' % path)
-            os.rename(path, tmp_path)
-
-        pool.cleanup()
         return path

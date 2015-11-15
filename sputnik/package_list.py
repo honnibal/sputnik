@@ -27,7 +27,7 @@ class PackageList(Base):
             os.mkdir(self.path)
 
         for path in os.listdir(self.path):
-            if path.endswith('.install') or path.endswith('.remove'):
+            if path.endswith('.tmp'):
                 continue
 
             meta_path = os.path.join(self.path, path, default.META_FILENAME)
