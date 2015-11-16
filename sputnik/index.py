@@ -65,15 +65,27 @@ class Index(Base):
         session = Session(self.data_path, s=self.s)
         cache = Cache(self.data_path, s=self.s)
 
+        # remember cached packages for removal
+        packages = cache.list_all()
+
         index = json.load(session.open(request, 'utf8'))
 
-        for name, (meta_url, etag) in index.items():
-            url = urljoin(self.repository_url, meta_url)
-            request = GetRequest(url)
-            response = session.open(request, 'utf8')
-            meta = json.load(response)
+        for ident, (meta_url, etag) in index.items():
+            if not cache.exists(ident, etag):
+                url = urljoin(self.repository_url, meta_url)
+                request = GetRequest(url)
+                response = session.open(request, 'utf8')
+                meta = json.load(response)
 
-            package = PackageStub(meta['package'], s=self.s)
-            assert name == package.ident
+                package = PackageStub(meta['package'], s=self.s)
+                assert ident == package.ident
+                assert util.unquote(response.headers['etag']) == etag
 
-            cache.update(meta, url=url)
+                cache.update(meta, url=url, etag=etag)
+
+            # shrink list by one
+            packages = [p for p in packages if p.ident != ident]
+
+        # remove leftovers
+        for package in packages:
+            package.remove()

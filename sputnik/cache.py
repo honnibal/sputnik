@@ -57,13 +57,10 @@ class CachedPackage(PackageStub):
         if not os.path.isdir(self.path):
             raise Exception("not installed")
 
-        tmp = self.path + ".remove"
-
         # cleanup remove
         if os.path.exists(self.path):
-            self.s.log('pending remove %s' % self.path)
+            tmp = self.path + '.tmp'
             shutil.move(self.path, tmp)
-            self.s.log('remove %s' % self.path)
             shutil.rmtree(tmp)
 
         self.cache.load()
@@ -79,13 +76,21 @@ class Cache(PackageList):
 
         super(Cache, self).__init__(cache_path, **kwargs)
 
-    def update(self, meta, url):
+    def exists(self, ident, etag):
+        packages = [p for p in self.list() if p.ident == ident]
+        if packages:
+            assert len(packages) <= 1
+            return packages[0].meta['etag'] == etag
+        return False
+
+    def update(self, meta, url, etag=None):
         assert len(meta['archive']) == 2
         meta = dict(meta)
 
         package = PackageStub(meta['package'], s=self.s)
 
         meta['archive'].append(urljoin(url, meta['archive'][0]))
+        meta['etag'] = etag
 
         path = os.path.join(self.path, package.ident,
                             default.META_FILENAME)

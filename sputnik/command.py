@@ -44,16 +44,11 @@ class Command(Base):
             package.remove()
 
     def search(self, search_string=default.search_string):
-        cache = Cache(self.data_path, s=self.s)
-        cache.purge()
-
+        # TODO make it work without data dir???
         index = Index(self.data_path, self.repository_url, s=self.s)
         index.update()
 
-        # FIXME ugly workaround to make disappearing packages work
-        # TODO make it work without data dir???
-
-        cache.load()
+        cache = Cache(self.data_path, s=self.s)
         packages = cache.list(search_string)
         util.json_print(self.s.log, [p.ident for p in packages])
         return packages
