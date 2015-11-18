@@ -68,7 +68,7 @@ class Index(Base):
         self.s.log('reindex %s' % res)
         return res
 
-    def update(self, max_retries=3):
+    def update(self, max_retries=5):
         if max_retries <= 0:
             raise Exception('index server out of sync')
 
@@ -94,7 +94,7 @@ class Index(Base):
                 # index server's etag should match s3's etag
                 if util.unquote(response.headers['etag']) != etag:
                     self.s.log('wait for index server to sync')
-                    time.sleep(10)
+                    time.sleep(3)
                     return self.update(max_retries - 1)
 
                 assert util.unquote(response.headers['etag']) == etag
