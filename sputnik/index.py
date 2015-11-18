@@ -91,7 +91,7 @@ class Index(Base):
                 package = PackageStub(meta['package'], s=self.s)
                 assert ident == package.ident
 
-                if util.unquote(response.headers['etag']) == etag:
+                if util.unquote(response.headers['etag']) != etag:
                     self.s.log('wait for index server to sync')
                     time.sleep(10)
                     return self.update(max_retries-1)
