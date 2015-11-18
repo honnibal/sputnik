@@ -12,7 +12,10 @@ from .cache import Cache
 
 
 class Command(Base):
-    def __init__(self, data_path=None, repository_url=None, **kwargs):
+    def __init__(self,
+                 data_path=default.data_path,
+                 repository_url=default.repository_url,
+                 **kwargs):
         self.data_path = data_path
         self.repository_url = repository_url
 
