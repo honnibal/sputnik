@@ -4,9 +4,7 @@ import platform
 import semver
 
 from .command import Command
-
-
-version = '0.4.1'
+from .__about__ import __version__
 
 
 class Sputnik(object):
@@ -24,7 +22,7 @@ class Sputnik(object):
     def user_agent(self):
         uname = platform.uname()
         user_agent_vars = [
-            ('Sputnik', version),
+            ('Sputnik', __version__),
             (self.name, self.version),
             (platform.python_implementation(), platform.python_version()),
             (platform.uname()[0], uname[2]),
