@@ -37,8 +37,7 @@ def test_build_install_remove(command, sample_package_path, tmp_path):
 def test_install_incompatible(sample_package_path, sample_package_path2, tmp_path):
     s = Sputnik('test', '1.0.0')
     command = s.make_command(
-        data_path=tmp_path,
-        repository_url=os.environ.get('REPOSITORY_URL'))
+        data_path=tmp_path)
 
     archive1 = command.build(sample_package_path)
     package1 = command.install(archive1.path)
@@ -55,16 +54,14 @@ def test_install_incompatible(sample_package_path, sample_package_path2, tmp_pat
 def test_install_upgrade(sample_package_path, sample_package_path2, tmp_path):
     s = Sputnik('test', '1.0.0')
     command = s.make_command(
-        data_path=tmp_path,
-        repository_url=os.environ.get('REPOSITORY_URL'))
+        data_path=tmp_path)
 
     archive = command.build(sample_package_path)
     command.install(archive.path)
 
     s = Sputnik('test', '2.0.0')
     command = s.make_command(
-        data_path=tmp_path,
-        repository_url=os.environ.get('REPOSITORY_URL'))
+        data_path=tmp_path)
 
     packages = command.list()
     assert len(packages) == 0
@@ -73,8 +70,7 @@ def test_install_upgrade(sample_package_path, sample_package_path2, tmp_path):
 def test_purge(sample_package_path, tmp_path):
     s = Sputnik('test', '1.0.0')
     command = s.make_command(
-        data_path=tmp_path,
-        repository_url=os.environ.get('REPOSITORY_URL'))
+        data_path=tmp_path)
 
     archive = command.build(sample_package_path)
     command.install(archive.path)
