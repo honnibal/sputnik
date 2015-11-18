@@ -53,10 +53,13 @@ class Command(Base):
         util.json_print(self.s.log, [p.ident for p in packages])
         return packages
 
-    def list(self, package_string=default.list_package_string, meta=default.list_meta):
-        # TODO add cli option to list cache
-        pool = Pool(self.data_path, s=self.s)
-        packages = pool.list(package_string)
+    def list(self, package_string=default.list_package_string,
+             meta=default.list_meta,
+             cache=default.list_cache):
+
+        cls = cache and Cache or Pool
+        obj = cls(self.data_path, s=self.s)
+        packages = obj.list(package_string)
         keys = not meta and ('name', 'version') or ()
         util.json_print(self.s.log, [p.to_dict(keys) for p in packages])
         return packages

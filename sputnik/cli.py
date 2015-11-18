@@ -75,10 +75,16 @@ def add_list_parser(subparsers):
         default=default.list_meta,
         action='store_true',
         help='show package meta data')
+    parser.add_argument('--cache',
+        default=default.list_cache,
+        action='store_true',
+        help='list cached instead of installed packages')
 
     def run(args):
         c = make_command(args)
-        c.list(package_string=args.package_string, meta=args.meta)
+        c.list(package_string=args.package_string,
+               meta=args.meta,
+               cache=args.cache)
 
     parser.set_defaults(run=run)
 

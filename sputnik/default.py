@@ -3,6 +3,7 @@ list_meta = False
 list_package_string = ''
 search_string = ''
 build_package_path = '.'
+list_cache = False
 
 # misc
 CHUNK_SIZE = 1024 * 16
