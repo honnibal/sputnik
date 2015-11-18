@@ -68,3 +68,19 @@ def test_install_upgrade(sample_package_path, sample_package_path2, tmp_path):
 
     packages = command.list()
     assert len(packages) == 0
+
+
+def test_purge(sample_package_path, tmp_path):
+    s = Sputnik('test', '1.0.0')
+    command = s.make_command(
+        data_path=tmp_path,
+        repository_url=os.environ.get('REPOSITORY_URL'))
+
+    archive = command.build(sample_package_path)
+    command.install(archive.path)
+
+    assert len(command.list()) == 1
+
+    command.purge()
+
+    assert len(command.list()) == 0
