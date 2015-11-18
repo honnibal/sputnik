@@ -91,13 +91,13 @@ class Index(Base):
                 package = PackageStub(meta['package'], s=self.s)
                 assert ident == package.ident
 
+                # index server's etag should match s3's etag
                 if util.unquote(response.headers['etag']) != etag:
                     self.s.log('wait for index server to sync')
                     time.sleep(10)
-                    return self.update(max_retries-1)
+                    return self.update(max_retries - 1)
 
                 assert util.unquote(response.headers['etag']) == etag
-
                 cache.update(meta, url=url, etag=etag)
 
             # shrink list by one
