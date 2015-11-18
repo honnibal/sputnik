@@ -3,7 +3,7 @@
 # https://github.com/pypa/warehouse/blob/master/warehouse/__about__.py
 
 __title__ = 'sputnik'
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 __summary__ = 'Sputnik data package manager library'
 __uri__ = 'https://github.com/henningpeters/sputnik'
 __author__ = 'Henning Peters'

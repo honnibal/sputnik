@@ -95,6 +95,3 @@ class PackageList(Base):
     def purge(self):
         for package in self.list():
             package.remove()
-
-        if not os.listdir(self.path):
-            os.rmdir(self.path)

@@ -67,6 +67,18 @@ def test_install_upgrade(sample_package_path, sample_package_path2, tmp_path):
     assert len(packages) == 0
 
 
+def test_purge_raw(sample_package_path, tmp_path):
+    s = Sputnik('test', '1.0.0')
+    command = s.make_command(
+        data_path=tmp_path)
+
+    assert len(command.list()) == 0
+
+    command.purge()
+
+    assert os.path.isdir(tmp_path)
+
+
 def test_purge(sample_package_path, tmp_path):
     s = Sputnik('test', '1.0.0')
     command = s.make_command(
