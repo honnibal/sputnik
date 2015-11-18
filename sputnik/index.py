@@ -32,14 +32,20 @@ class Index(Base):
 
         access_key_id = os.environ['AWS_ACCESS_KEY_ID']
         secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
-        region = os.environ['AWS_REGION']
-        bucket = os.environ['S3_BUCKET']
-
         os.environ['S3_USE_SIGV4'] = 'True'
-        conn = S3Connection(access_key_id, secret_access_key,
-                            host='s3.%s.amazonaws.com' % region)
-        bucket = conn.get_bucket(bucket, validate=False)
 
+        # get aws/s3 upload information
+        session = Session(self.data_path, s=self.s)
+        url = urljoin(self.repository_url, '/upload')
+        request = GetRequest(url)
+        response = session.open(request, 'utf8')
+        result = json.load(response)
+
+        conn = S3Connection(access_key_id, secret_access_key,
+                            host='s3.%s.amazonaws.com' % result['region'])
+        bucket = conn.get_bucket(result['bucket'], validate=False)
+
+        # to allow random access we upload each archive member individually
         archive = Archive(path, s=self.s)
         for key_name, f in archive.fileobjs().items():
             self.s.log('preparing upload for %s' % key_name)
@@ -52,8 +58,9 @@ class Index(Base):
             key = bucket.new_key(key_name)
             key.set_contents_from_file(f, headers=headers)
 
+        # without reindexing the index server wouldn't know that we
+        # uploaded a new package
         request = PutRequest(urljoin(self.repository_url, '/reindex'))
-        session = Session(self.data_path, s=self.s)
         response = session.open(request)
 
         res = response.getcode() == 200
