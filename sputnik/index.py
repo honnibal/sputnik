@@ -1,6 +1,7 @@
 import os
 import json
 import hashlib
+import time
 try:
     from urllib.parse import urljoin
 except ImportError:
@@ -67,7 +68,10 @@ class Index(Base):
         self.s.log('reindex %s' % res)
         return res
 
-    def update(self):
+    def update(self, max_retries=3):
+        if max_retries <= 0:
+            raise Exception('index server out of sync')
+
         request = GetRequest(urljoin(self.repository_url, '/index'))
         session = Session(self.data_path, s=self.s)
         cache = Cache(self.data_path, s=self.s)
@@ -86,6 +90,12 @@ class Index(Base):
 
                 package = PackageStub(meta['package'], s=self.s)
                 assert ident == package.ident
+
+                if util.unquote(response.headers['etag']) == etag:
+                    self.s.log('wait for index server to sync')
+                    time.sleep(10)
+                    return self.update(max_retries-1)
+
                 assert util.unquote(response.headers['etag']) == etag
 
                 cache.update(meta, url=url, etag=etag)
