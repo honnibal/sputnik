@@ -77,11 +77,15 @@ class Command(Base):
         return io.open(file_path, 'rb')
 
     def files(self, package_string):
-        pool = Pool(self.data_path, s=self.s)
-        package = pool.get(package_string)
+        if os.path.isfile(package_string):
+            obj = Archive(package_string, s=self.s)
+        else:
+            pool = Pool(self.data_path, s=self.s)
+            obj = pool.get(package_string)
+
         files = {f['path']: {'checksum': f['checksum'], 'size': f['size']}
-                 for f in package.manifest}
-        util.json_print(self.s.log, {package.ident: files})
+                 for f in obj.manifest}
+        util.json_print(self.s.log, {obj.ident: files})
         return files
 
     def purge(self, cache=False, pool=False):

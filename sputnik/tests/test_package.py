@@ -70,3 +70,25 @@ def test_file_path_same_build_directory(tmp_path, tmp_path2, sample_package_path
     assert not package.has_file('data/model')
     with pytest.raises(Exception):
         assert package.file_path('data/model')
+
+
+@pytest.mark.xfail
+def test_new_archive_files(tmp_path, sample_package_path):
+    s = Sputnik('test', '1.0.0')
+    recipe = PackageRecipe(sample_package_path, s=s)
+    archive = recipe.build(tmp_path)
+
+    assert archive.manifest
+    assert archive.manifest[0]['path'] == 'data/model1'
+    assert archive.manifest[1]['path'] == 'data/model2'
+
+
+def test_archive_files(tmp_path, sample_package_path):
+    s = Sputnik('test', '1.0.0')
+    recipe = PackageRecipe(sample_package_path, s=s)
+    new_archive = recipe.build(tmp_path)
+    archive = Archive(new_archive.path, s=s)
+
+    assert archive.manifest
+    assert archive.manifest[0]['path'] == 'data/model1'
+    assert archive.manifest[1]['path'] == 'data/model2'

@@ -5,7 +5,8 @@ import io
 
 import pytest
 
-from ..archive_writer import ArchiveWriter, InvalidPathException
+from ..archive_writer import ArchiveWriter, InvalidPathException,\
+                             EmptyArchiveException
 from ..archive_reader import ArchiveReader
 from ..default import ARCHIVE_FILENAME, META_FILENAME
 
@@ -126,5 +127,14 @@ def test_create_abspath_without_base_path(tmp_path, sample_package_path):
     archive_path = os.path.join(tmp_path, 'test.sputnik')
 
     f = ArchiveWriter(archive_path)
+
     with pytest.raises(InvalidPathException):
         f.add_path(sample_package_path)
+
+    with pytest.raises(EmptyArchiveException):
+        f.close()
+
+    assert not os.path.exists(f.tmp_path)
+    assert not os.path.exists(archive_path)
+    assert os.path.exists(tmp_path)
+    assert len(os.listdir(tmp_path)) == 0

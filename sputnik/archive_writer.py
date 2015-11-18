@@ -5,6 +5,7 @@ import tarfile
 import time
 import tempfile
 import hashlib
+import shutil
 
 from . import util
 from . import default
@@ -34,8 +35,6 @@ class ArchiveWriter(object):
 
     def __del__(self):
         self.archive.close()
-        import shutil
-        shutil.rmtree(self.tmp_path)
 
     def __enter__(self):
         return self
@@ -43,8 +42,13 @@ class ArchiveWriter(object):
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
+    def cleanup(self):
+        shutil.rmtree(self.tmp_path)
+        assert not os.path.exists(self.tmp_path)
+
     def close(self):
         if not len(self.meta['manifest']):
+            self.cleanup()
             raise EmptyArchiveException(self.path)
 
         mtime = time.time()
@@ -72,6 +76,8 @@ class ArchiveWriter(object):
                 info.mode = 0o644
                 info.uid = info.gid = 1000
                 tar.addfile(info, f)
+
+        self.cleanup()
 
     def add_json(self, name, obj):
         self.meta[name] = obj

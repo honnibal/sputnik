@@ -20,6 +20,10 @@ class Archive(PackageStub):
 
         super(Archive, self).__init__(defaults, **kwargs)
 
+    @property
+    def manifest(self):
+        return self.archive.get_member('manifest')
+
     def fileobjs(self):
         return {
             os.path.join(self.ident, default.META_FILENAME):
