@@ -72,7 +72,7 @@ class Index(Base):
         if max_retries <= 0:
             raise Exception('index server out of sync')
 
-        request = GetRequest(urljoin(self.repository_url, '/index'))
+        request = GetRequest(urljoin(self.repository_url, '/models'))
         session = Session(self.data_path, s=self.s)
         cache = Cache(self.data_path, s=self.s)
 
