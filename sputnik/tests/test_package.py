@@ -79,8 +79,8 @@ def test_new_archive_files(tmp_path, sample_package_path):
     archive = recipe.build(tmp_path)
 
     assert archive.manifest
-    assert archive.manifest[0]['path'] == 'data/model1'
-    assert archive.manifest[1]['path'] == 'data/model2'
+    assert set([m['path'] for m in archive.manifest]) == \
+           set(['data/model1', 'data/model2'])
 
 
 def test_archive_files(tmp_path, sample_package_path):
@@ -90,5 +90,5 @@ def test_archive_files(tmp_path, sample_package_path):
     archive = Archive(new_archive.path, s=s)
 
     assert archive.manifest
-    assert archive.manifest[0]['path'] == 'data/model1'
-    assert archive.manifest[1]['path'] == 'data/model2'
+    assert set([m['path'] for m in archive.manifest]) == \
+           set(['data/model1', 'data/model2'])
