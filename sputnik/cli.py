@@ -13,11 +13,11 @@ def package_path_type(path):
     return path
 
 
-def make_command(args):
+def command(args):
     s = Sputnik(name=args.name,
                 version=args.version,
                 console=sys.stdout)
-    return s.make_command(
+    return s.command(
         data_path=args.data_path,
         repository_url=args.repository_url)
 
@@ -32,7 +32,7 @@ def add_build_parser(subparsers):
         help='package.json directory')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.build(package_path=args.package_path)
 
     parser.set_defaults(run=run)
@@ -45,7 +45,7 @@ def add_install_parser(subparsers):
         help='package name or path')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.install(package_name=args.package_name)
 
     parser.set_defaults(run=run)
@@ -58,7 +58,7 @@ def add_remove_parser(subparsers):
         help='package string')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.remove(package_string=args.package_string)
 
     parser.set_defaults(run=run)
@@ -81,7 +81,7 @@ def add_list_parser(subparsers):
         help='list cached instead of installed packages')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.list(package_string=args.package_string,
                meta=args.meta,
                cache=args.cache)
@@ -97,7 +97,7 @@ def add_search_parser(subparsers):
         help='search string')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.search(search_string=args.search_string)
 
     parser.set_defaults(run=run)
@@ -110,7 +110,7 @@ def add_upload_parser(subparsers):
         help='package path')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.upload(package_path=args.package_path)
 
     parser.set_defaults(run=run)
@@ -121,7 +121,7 @@ def add_update_parser(subparsers):
         help='update package cache')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.update()
 
     parser.set_defaults(run=run)
@@ -136,7 +136,7 @@ def add_file_parser(subparsers):
         help='file path')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.file(package_string=args.package_string,
                path=args.path)
 
@@ -150,7 +150,7 @@ def add_files_parser(subparsers):
         help='package string')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.files(package_string=args.package_string)
 
     parser.set_defaults(run=run)
@@ -169,7 +169,7 @@ def add_purge_parser(subparsers):
         help='purge pool (installed packages)')
 
     def run(args):
-        c = make_command(args)
+        c = command(args)
         c.purge(cache=args.cache,
                 pool=args.pool)
 

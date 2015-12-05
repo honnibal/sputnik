@@ -5,6 +5,10 @@ import semver
 
 from .command import Command
 from .__about__ import __version__
+from .pool import Pool
+
+
+# TODO support asterisks in versions
 
 
 class Sputnik(object):
@@ -15,9 +19,12 @@ class Sputnik(object):
         self.version = version
         self.console = console
 
-    def make_command(self, *args, **kwargs):
+    def command(self, *args, **kwargs):
         kwargs['s'] = self
         return Command(*args, **kwargs)
+
+    def pool(self, path):
+        return Pool(path, s=self)
 
     def user_agent(self):
         uname = platform.uname()

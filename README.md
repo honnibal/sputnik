@@ -38,7 +38,7 @@ sputnik = Sputnik()
 Then build the package with following code, it should produce a new file and output its path: ```sample/my_model-1.0.0.sputnik```.
 
 ```
-command = sputnik.make_command()
+command = sputnik.command()
 archive = command.build('sample')
 print(archive.path)
 ```
@@ -48,7 +48,7 @@ print(archive.path)
 Decide for a location for your installed packages, e.g., ```packages```. Then install the previously built package with following code, it should output the path of the now installed package: ```packages/my_model-1.0.0```
 
 ```
-command = sputnik.make_command(data_path='packages')
+command = sputnik.command(data_path='packages')
 package = command.install('sample/my_model-1.0.0.sputnik')
 print(package.path)
 ```
@@ -58,7 +58,7 @@ print(package.path)
 This should output the package strings for all installed packages, e.g., ```['my_model-1.0.0']```:
 
 ```
-command = sputnik.make_command(data_path='packages')
+command = sputnik.command(data_path='packages')
 packages = command.list()
 print([p.ident for p in packages])
 ```
@@ -123,7 +123,7 @@ Let's get another Sputnik reference - now passing our library name and version t
 
 ```
 sputnik = Sputnik('my_library', '0.6.0')
-command = sputnik.make_command(data_path='packages')
+command = sputnik.command(data_path='packages')
 
 archive = command.build('my_model')
 command.install(archive.path)
@@ -140,7 +140,7 @@ Upgrading our library to version ```0.6.1```:
 
 ```
 sputnik = Sputnik('my_library', '0.6.1')
-command = sputnik.make_command(data_path='packages')
+command = sputnik.command(data_path='packages')
 
 archive = command.build('my_model')
 command.install(archive.path)

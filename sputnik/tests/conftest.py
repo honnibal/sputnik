@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import io
 import os
 import tempfile
+import json
 
 import pytest
 
@@ -34,12 +35,11 @@ def sample_package_path(version='1.0.0', compat_version='==1.0.0'):
         }))
     data_path = os.path.join(path, 'data')
     os.mkdir(data_path)
-    with io.open(os.path.join(data_path, 'model1'), 'w') as f:
+    with io.open(os.path.join(data_path, 'xyz.model'), 'w') as f:
         for i in range(1):
             f.write(('%s' % i) * 1024)
-    with io.open(os.path.join(data_path, 'model2'), 'w') as f:
-        for i in range(1):
-            f.write(('%s' % i) * 1024)
+    with open(os.path.join(data_path, 'xyz.json'), 'w') as f:
+        json.dump({'test': True}, f)
     return path
 
 
@@ -51,6 +51,6 @@ def sample_package_path2():
 @pytest.fixture
 def command(tmp_path):
     s = Sputnik(None, None)
-    return s.make_command(
+    return s.command(
         data_path=tmp_path,
         repository_url=os.environ.get('REPOSITORY_URL'))

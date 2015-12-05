@@ -1,3 +1,4 @@
+import io
 import os
 from hashlib import md5
 import shutil
@@ -12,6 +13,15 @@ from .package_string import PackageString
 from .package_stub import PackageStub
 
 
+class InvalidPathPartsException(Exception): pass
+
+
+def get_path(*path_parts):
+    if any([p for p in path_parts if '/' in p or '\\' in p]):
+        raise InvalidPathPartsException('avoid / and \\ in path parts: %s' % path_parts)
+    return os.path.join(*path_parts)
+
+
 class Package(PackageStub):  # installed package
     def __init__(self, **kwargs):
         self.path = kwargs.pop('path')
@@ -21,11 +31,13 @@ class Package(PackageStub):  # installed package
         kwargs['defaults'] = self.meta['package']
         super(Package, self).__init__(**kwargs)
 
-    def has_file(self, path):
+    def has_file(self, *path_parts):
+        path = get_path(*path_parts)
         return any([m for m in self.manifest if m['path'] == path])
 
-    def file_path(self, path):
-        if not self.has_file(path):
+    def file_path(self, *path_parts):
+        path = get_path(*path_parts)
+        if not self.has_file(*path_parts):
             raise Exception('package does not include file: %s' % path)
 
         res = os.path.join(self.path, path)
@@ -33,11 +45,21 @@ class Package(PackageStub):  # installed package
             raise Exception('file not found: %s' % res)
         return res
 
-    def dir_path(self, path):
+    def dir_path(self, *path_parts):
+        path = get_path(*path_parts)
+
         res = os.path.join(self.path, path)
         if not os.path.isdir(res):
             raise Exception('file not found: %s' % res)
         return res
+
+    def load_utf8(self, func, *path_parts):
+        path = self.file_path(*path_parts)
+        return func(io.open(path, mode='r', encoding='utf8'))
+
+    def load_bin(self, func, *path_parts):
+        path = self.file_path(*path_parts)
+        return func(io.open(path, mode='rb'))
 
     @property
     def manifest(self):

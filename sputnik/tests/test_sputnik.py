@@ -8,7 +8,7 @@ from ..archive import PackageNotCompatibleException
 
 def test_build(sample_package_path):
     sputnik = Sputnik()
-    command = sputnik.make_command()
+    command = sputnik.command()
     archive = command.build(sample_package_path)
     assert os.path.isfile(archive.path)
 
@@ -36,7 +36,7 @@ def test_build_install_remove(command, sample_package_path, tmp_path):
 
 def test_install_incompatible(sample_package_path, sample_package_path2, tmp_path):
     s = Sputnik('test', '1.0.0')
-    command = s.make_command(
+    command = s.command(
         data_path=tmp_path)
 
     archive1 = command.build(sample_package_path)
@@ -53,14 +53,14 @@ def test_install_incompatible(sample_package_path, sample_package_path2, tmp_pat
 
 def test_install_upgrade(sample_package_path, sample_package_path2, tmp_path):
     s = Sputnik('test', '1.0.0')
-    command = s.make_command(
+    command = s.command(
         data_path=tmp_path)
 
     archive = command.build(sample_package_path)
     command.install(archive.path)
 
     s = Sputnik('test', '2.0.0')
-    command = s.make_command(
+    command = s.command(
         data_path=tmp_path)
 
     packages = command.list()
@@ -69,7 +69,7 @@ def test_install_upgrade(sample_package_path, sample_package_path2, tmp_path):
 
 def test_purge_raw(sample_package_path, tmp_path):
     s = Sputnik('test', '1.0.0')
-    command = s.make_command(
+    command = s.command(
         data_path=tmp_path)
 
     assert len(command.list()) == 0
@@ -81,7 +81,7 @@ def test_purge_raw(sample_package_path, tmp_path):
 
 def test_purge(sample_package_path, tmp_path):
     s = Sputnik('test', '1.0.0')
-    command = s.make_command(
+    command = s.command(
         data_path=tmp_path)
 
     archive = command.build(sample_package_path)

@@ -1,4 +1,5 @@
 import os
+import json
 
 import pytest
 
@@ -38,6 +39,19 @@ def test_archive_is_compatible(tmp_path, sample_package_path):
     assert not archive.is_compatible()
 
 
+def test_file_load(tmp_path, tmp_path2, sample_package_path):
+    s = Sputnik('test', '1.0.0')
+    recipe = PackageRecipe(sample_package_path, s=s)
+    archive = Archive(recipe.build(tmp_path).path, s=s)
+    pool = Pool(tmp_path2, s=s)
+    package = Package(path=archive.install(pool), s=s)
+
+    assert package.has_file('data', 'xyz.model')
+    assert package.load_utf8(json.load, 'data', 'xyz.json') == {'test': True}
+    assert package.load_bin(lambda x:x.read(), 'data', 'xyz.json') == \
+        json.dumps({'test': True}).encode('ascii')
+
+
 def test_file_path(tmp_path, tmp_path2, sample_package_path):
     s = Sputnik('test', '1.0.0')
     recipe = PackageRecipe(sample_package_path, s=s)
@@ -45,14 +59,14 @@ def test_file_path(tmp_path, tmp_path2, sample_package_path):
     pool = Pool(tmp_path2, s=s)
     package = Package(path=archive.install(pool), s=s)
 
-    assert package.has_file('data/model1')
-    assert package.file_path('data/model1') == os.path.join(package.path, 'data/model1')
+    assert package.has_file('data', 'xyz.model')
+    assert package.file_path('data', 'xyz.model') == os.path.join(package.path, 'data', 'xyz.model')
     assert package.dir_path('data') == os.path.join(package.path, 'data')
 
     assert not package.has_file('data')
-    assert not package.has_file('data/model')
+    assert not package.has_file('data', 'model')
     with pytest.raises(Exception):
-        assert package.file_path('data/model')
+        assert package.file_path('data', 'model')
 
 
 def test_file_path_same_build_directory(tmp_path, tmp_path2, sample_package_path):
@@ -62,14 +76,14 @@ def test_file_path_same_build_directory(tmp_path, tmp_path2, sample_package_path
     pool = Pool(tmp_path2, s=s)
     package = Package(path=archive.install(pool), s=s)
 
-    assert package.has_file('data/model1')
-    assert package.file_path('data/model1') == os.path.join(package.path, 'data/model1')
+    assert package.has_file('data', 'xyz.model')
+    assert package.file_path('data', 'xyz.model') == os.path.join(package.path, 'data', 'xyz.model')
     assert package.dir_path('data') == os.path.join(package.path, 'data')
 
     assert not package.has_file('data')
-    assert not package.has_file('data/model')
+    assert not package.has_file('data', 'model')
     with pytest.raises(Exception):
-        assert package.file_path('data/model')
+        assert package.file_path('data', 'model')
 
 
 @pytest.mark.xfail
@@ -80,7 +94,7 @@ def test_new_archive_files(tmp_path, sample_package_path):
 
     assert archive.manifest
     assert set([m['path'] for m in archive.manifest]) == \
-           set(['data/model1', 'data/model2'])
+           set(['data/xyz.model', 'data/xyz.json'])
 
 
 def test_archive_files(tmp_path, sample_package_path):
@@ -91,4 +105,4 @@ def test_archive_files(tmp_path, sample_package_path):
 
     assert archive.manifest
     assert set([m['path'] for m in archive.manifest]) == \
-           set(['data/model1', 'data/model2'])
+           set(['data/xyz.model', 'data/xyz.json'])
