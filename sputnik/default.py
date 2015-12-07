@@ -8,10 +8,9 @@ repository_url = 'https://index.spacy.io'
 
 try:
     import os
-    import spacy.en
-    data_path = os.path.abspath(os.path.join(os.path.dirname(spacy.en.__file__),
-                                             '..', 'data'))
-except (ImportError, AttributeError):
+    import spacy
+    data_path = os.path.abspath(os.path.join(os.path.dirname(spacy.__file__), 'data'))
+except ImportError:
     data_path = None
 
 # misc

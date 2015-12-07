@@ -62,6 +62,7 @@ class Package(PackageStub):  # installed package
         if not os.path.isdir(res):
             if require:
                 raise NotFoundException('dir not found: %s' % res)
+        # TODO check whether path is part of package
         return res
 
     def _load(self, func, *path_parts, **kwargs):
