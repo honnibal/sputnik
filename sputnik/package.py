@@ -39,6 +39,7 @@ class Package(PackageStub):  # installed package
 
     def file_path(self, *path_parts, **kwargs):
         require = kwargs.pop('require', True)
+        assert not kwargs
         path = get_path(*path_parts)
 
         if not self.has_file(*path_parts):
@@ -70,10 +71,11 @@ class Package(PackageStub):  # installed package
         try:
             path = self.file_path(*path_parts)
         except (NotIncludedException, NotFoundException):
-            if require and not default:
+            if require and default is None:
                 raise
             return default
-        return func(io.open(path, **kwargs))
+        with io.open(path, **kwargs) as f:
+            return func(f)
 
     def load_utf8(self, func, *path_parts, **kwargs):
         kwargs.update({'mode': 'r', 'encoding': 'utf8'})

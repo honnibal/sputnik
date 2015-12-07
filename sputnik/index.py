@@ -15,9 +15,6 @@ from .cache import Cache
 from .package_stub import PackageStub
 
 
-class PackageNotFoundException(Exception): pass
-
-
 class Index(Base):
     def __init__(self, data_path, repository_url, **kwargs):
         if not repository_url:

@@ -54,10 +54,10 @@ def test_file_load(tmp_path, tmp_path2, sample_package_path):
 
     assert not package.has_file('data', 'model')
 
-    assert package.load_utf8(None, 'data', 'model', default=1) == 1
+    assert package.load_utf8(None, 'data', 'model', default=0) == 0
     assert package.load_utf8(None, 'data', 'model', require=False) == None
 
-    assert package.load(None, 'data', 'model', default=1) == 1
+    assert package.load(None, 'data', 'model', default=0) == 0
     assert package.load(None, 'data', 'model', require=False) == None
 
 

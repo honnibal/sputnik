@@ -58,7 +58,7 @@ class PackageList(Base):
                 candidates.append(ps)
 
         if not candidates:
-            raise PackageNotFoundException
+            raise PackageNotFoundException(package_string)
 
         candidates.sort(key=lambda c: (c.package.is_compatible(), c))
         package = candidates[-1].package
