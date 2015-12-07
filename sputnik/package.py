@@ -14,6 +14,8 @@ from .package_stub import PackageStub
 
 
 class InvalidPathPartsException(Exception): pass
+class NotFoundException(Exception): pass
+class NotIncludedException(Exception): pass
 
 
 def get_path(*path_parts):
@@ -35,31 +37,51 @@ class Package(PackageStub):  # installed package
         path = get_path(*path_parts)
         return any([m for m in self.manifest if m['path'] == path])
 
-    def file_path(self, *path_parts):
+    def file_path(self, *path_parts, **kwargs):
+        require = kwargs.pop('require', True)
         path = get_path(*path_parts)
+
         if not self.has_file(*path_parts):
-            raise Exception('package does not include file: %s' % path)
+            if require:
+                raise NotIncludedException('package does not include file: %s' % path)
+            return
 
         res = os.path.join(self.path, path)
         if not os.path.isfile(res):
-            raise Exception('file not found: %s' % res)
+            if require:
+                raise NotFoundException('file not found: %s' % res)
+            return
         return res
 
-    def dir_path(self, *path_parts):
+    def dir_path(self, *path_parts, **kwargs):
+        require = kwargs.pop('require', True)
         path = get_path(*path_parts)
 
         res = os.path.join(self.path, path)
         if not os.path.isdir(res):
-            raise Exception('file not found: %s' % res)
+            if require:
+                raise NotFoundException('dir not found: %s' % res)
         return res
 
-    def load_utf8(self, func, *path_parts):
-        path = self.file_path(*path_parts)
-        return func(io.open(path, mode='r', encoding='utf8'))
+    def _load(self, func, *path_parts, **kwargs):
+        require = kwargs.pop('require', True)
+        default = kwargs.pop('default', None)
 
-    def load_bin(self, func, *path_parts):
-        path = self.file_path(*path_parts)
-        return func(io.open(path, mode='rb'))
+        try:
+            path = self.file_path(*path_parts)
+        except (NotIncludedException, NotFoundException):
+            if require and not default:
+                raise
+            return default
+        return func(io.open(path, **kwargs))
+
+    def load_utf8(self, func, *path_parts, **kwargs):
+        kwargs.update({'mode': 'r', 'encoding': 'utf8'})
+        return self._load(func, *path_parts, **kwargs)
+
+    def load(self, func, *path_parts, **kwargs):
+        kwargs.update({'mode': 'rb'})
+        return self._load(func, *path_parts, **kwargs)
 
     @property
     def manifest(self):

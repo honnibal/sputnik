@@ -11,7 +11,7 @@ try:
     import spacy.en
     data_path = os.path.abspath(os.path.join(os.path.dirname(spacy.en.__file__),
                                              '..', 'data'))
-except ImportError:
+except (ImportError, AttributeError):
     data_path = None
 
 # misc

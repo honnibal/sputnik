@@ -4,7 +4,8 @@ import json
 import pytest
 
 from .. import Sputnik
-from ..package import PackageRecipe, Package
+from ..package import (PackageRecipe, Package,
+                       NotFoundException, NotIncludedException)
 from ..archive import Archive
 from ..pool import Pool
 
@@ -48,8 +49,16 @@ def test_file_load(tmp_path, tmp_path2, sample_package_path):
 
     assert package.has_file('data', 'xyz.model')
     assert package.load_utf8(json.load, 'data', 'xyz.json') == {'test': True}
-    assert package.load_bin(lambda x:x.read(), 'data', 'xyz.json') == \
+    assert package.load(lambda x:x.read(), 'data', 'xyz.json') == \
         json.dumps({'test': True}).encode('ascii')
+
+    assert not package.has_file('data', 'model')
+
+    assert package.load_utf8(None, 'data', 'model', default=1) == 1
+    assert package.load_utf8(None, 'data', 'model', require=False) == None
+
+    assert package.load(None, 'data', 'model', default=1) == 1
+    assert package.load(None, 'data', 'model', require=False) == None
 
 
 def test_file_path(tmp_path, tmp_path2, sample_package_path):
@@ -65,8 +74,10 @@ def test_file_path(tmp_path, tmp_path2, sample_package_path):
 
     assert not package.has_file('data')
     assert not package.has_file('data', 'model')
-    with pytest.raises(Exception):
+    with pytest.raises(NotIncludedException):
         assert package.file_path('data', 'model')
+
+    assert package.file_path('data', 'model', require=False) is None
 
 
 def test_file_path_same_build_directory(tmp_path, tmp_path2, sample_package_path):
@@ -82,7 +93,7 @@ def test_file_path_same_build_directory(tmp_path, tmp_path2, sample_package_path
 
     assert not package.has_file('data')
     assert not package.has_file('data', 'model')
-    with pytest.raises(Exception):
+    with pytest.raises(NotIncludedException):
         assert package.file_path('data', 'model')
 
 
