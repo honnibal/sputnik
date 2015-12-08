@@ -53,4 +53,4 @@ def command(tmp_path):
     s = Sputnik(None, None)
     return s.command(
         data_path=tmp_path,
-        repository_url=os.environ.get('REPOSITORY_URL'))
+        repository_url=os.environ.get('REPOSITORY_URL', 'https://index-staging.spacy.io'))

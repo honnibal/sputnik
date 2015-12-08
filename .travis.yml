@@ -2,15 +2,9 @@ language: python
 
 sudo: false
 
-python:
-  - 2.7
-  - 3.4
-  - pypy
-
 install:
   - pip install --upgrade pip
-  - pip install boto
-  - pip install -r requirements.txt
+  - pip install tox
 
 script:
-  - python -m sputnik test --junitxml=pytest.xml
+  - tox
