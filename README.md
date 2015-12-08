@@ -145,3 +145,4 @@ command = sputnik.command(data_path='packages')
 archive = command.build('my_model')
 command.install(archive.path)
 ```
+
