@@ -160,6 +160,7 @@ def read_request(session, url, offset=0, console=None,
             console.write("Continue downloading...\n")
         else:
             console.write("Downloading...\n")
+        console.flush()
 
     while True:
         with transfer_rate:
@@ -174,7 +175,7 @@ def read_request(session, url, offset=0, console=None,
             transfer_rate.update(len(chunk))
             eta.update(bytes_read - offset, total_size - offset)
 
-        if progress_func and console:
+        if progress_func and console and console.isatty():
             progress_func(console, bytes_read, total_size, transfer_rate, eta)
 
         if write_func:

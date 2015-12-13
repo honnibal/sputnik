@@ -1,6 +1,7 @@
 # pylint: disable=C0330
 import sys
 import argparse
+import os
 
 from . import validation
 from . import default
@@ -13,12 +14,16 @@ def package_path_type(path):
     return path
 
 
+def expand_path(path):
+    return path and os.path.expanduser(path) or path
+
+
 def command(args):
     s = Sputnik(name=args.name,
                 version=args.version,
                 console=sys.stdout)
     return s.command(
-        data_path=args.data_path,
+        data_path=expand_path(args.data_path),
         repository_url=args.repository_url)
 
 
@@ -33,7 +38,7 @@ def add_build_parser(subparsers):
 
     def run(args):
         c = command(args)
-        c.build(package_path=args.package_path)
+        c.build(package_path=expand_path(args.package_path))
 
     parser.set_defaults(run=run)
 
@@ -46,7 +51,7 @@ def add_install_parser(subparsers):
 
     def run(args):
         c = command(args)
-        c.install(package_name=args.package_name)
+        c.install(package_name=expand_path(args.package_name))
 
     parser.set_defaults(run=run)
 
@@ -111,7 +116,7 @@ def add_upload_parser(subparsers):
 
     def run(args):
         c = command(args)
-        c.upload(package_path=args.package_path)
+        c.upload(package_path=expand_path(args.package_path))
 
     parser.set_defaults(run=run)
 
@@ -138,7 +143,7 @@ def add_file_parser(subparsers):
     def run(args):
         c = command(args)
         c.file(package_string=args.package_string,
-               path=args.path)
+               path=expand_path(args.path))
 
     parser.set_defaults(run=run)
 

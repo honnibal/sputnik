@@ -33,9 +33,6 @@ class ArchiveWriter(object):
         self.archive = io.open(self.tmp_archive_path, 'wb')
         self.meta = {'manifest': []}
 
-    def __del__(self):
-        self.archive.close()
-
     def __enter__(self):
         return self
 
@@ -47,6 +44,8 @@ class ArchiveWriter(object):
         assert not os.path.exists(self.tmp_path)
 
     def close(self):
+        self.archive.close()
+
         if not len(self.meta['manifest']):
             self.cleanup()
             raise EmptyArchiveException(self.path)
