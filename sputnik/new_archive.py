@@ -9,9 +9,14 @@ class NewArchive(PackageStub):  # package archive
     def __init__(self, recipe, path, hash_func, **kwargs):
         self.hash_func = hash_func
         self.archive = None
-        filename = util.archive_filename(
-            recipe.name, recipe.version, suffix=True)
-        self.path = os.path.join(path, filename)
+
+        if os.path.isdir(path):
+            filename = util.archive_filename(
+                recipe.name, recipe.version, suffix=True)
+            self.path = os.path.join(path, filename)
+        else:
+            self.path = path
+
         self.base_path = kwargs.pop('base_path', path)
 
         super(NewArchive, self).__init__(recipe.to_dict(), **kwargs)

@@ -36,9 +36,9 @@ class Command(Base):
         path = archive.install(pool)
         return Package(path=path, s=self.s)
 
-    def build(self, package_path=default.build_package_path):
+    def build(self, package_path=default.build_package_path, archive_path=None):
         recipe = PackageRecipe(package_path, s=self.s)
-        return recipe.build(package_path)
+        return recipe.build(archive_path or package_path)
 
     def remove(self, package_string):
         pool = Pool(self.data_path, s=self.s)

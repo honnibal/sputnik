@@ -35,10 +35,14 @@ def add_build_parser(subparsers):
         default=default.build_package_path,
         nargs='?',
         help='package.json directory')
+    parser.add_argument('archive_path',
+        nargs='?',
+        help='archive path')
 
     def run(args):
         c = command(args)
-        c.build(package_path=expand_path(args.package_path))
+        c.build(package_path=expand_path(args.package_path),
+                archive_path=args.archive_path)
 
     parser.set_defaults(run=run)
 
