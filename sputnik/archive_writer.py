@@ -46,7 +46,7 @@ class ArchiveWriter(object):
     def close(self):
         self.archive.close()
 
-        if not len(self.meta['manifest']):
+        if not self.meta['manifest']:
             self.cleanup()
             raise EmptyArchiveException(self.path)
 

@@ -13,7 +13,7 @@ def test_build(sample_package_path):
     assert os.path.isfile(archive.path)
 
 
-def test_build_install_remove(command, sample_package_path, tmp_path):
+def test_build_install_remove(command, sample_package_path):
     archive = command.build(sample_package_path)
     assert os.path.isfile(archive.path)
 

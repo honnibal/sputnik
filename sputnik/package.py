@@ -59,9 +59,8 @@ class Package(PackageStub):  # installed package
         path = get_path(*path_parts)
 
         res = os.path.join(self.path, path)
-        if not os.path.isdir(res):
-            if require:
-                raise NotFoundException('dir not found: %s' % res)
+        if require and not os.path.isdir(res):
+            raise NotFoundException('dir not found: %s' % res)
         # TODO check whether path is part of package
         return res
 

@@ -80,11 +80,11 @@ def test_file_path(tmp_path, tmp_path2, sample_package_path):
     assert package.file_path('data', 'model', require=False) is None
 
 
-def test_file_path_same_build_directory(tmp_path, tmp_path2, sample_package_path):
+def test_file_path_same_build_directory(tmp_path, sample_package_path):
     s = Sputnik('test', '1.0.0')
     recipe = PackageRecipe(sample_package_path, s=s)
     archive = Archive(recipe.build(sample_package_path).path, s=s)
-    pool = Pool(tmp_path2, s=s)
+    pool = Pool(tmp_path, s=s)
     package = Package(path=archive.install(pool), s=s)
 
     assert package.has_file('data', 'xyz.model')
@@ -104,8 +104,8 @@ def test_new_archive_files(tmp_path, sample_package_path):
     archive = recipe.build(tmp_path)
 
     assert archive.manifest
-    assert set([m['path'] for m in archive.manifest]) == \
-           set(['data/xyz.model', 'data/xyz.json'])
+    assert {m['path'] for m in archive.manifest} == \
+           {'data/xyz.model', 'data/xyz.json'}
 
 
 def test_archive_files(tmp_path, sample_package_path):
@@ -115,5 +115,5 @@ def test_archive_files(tmp_path, sample_package_path):
     archive = Archive(new_archive.path, s=s)
 
     assert archive.manifest
-    assert set([m['path'] for m in archive.manifest]) == \
-           set(['data/xyz.model', 'data/xyz.json'])
+    assert {m['path'] for m in archive.manifest} == \
+           {'data/xyz.model', 'data/xyz.json'}
