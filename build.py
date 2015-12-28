@@ -54,6 +54,7 @@ elif install_mode == 'setup-develop':
 
 elif install_mode == 'test':
     x('pip install pytest')
+    x('pip install boto')
     x('pip list')
 
     if os.path.exists('tmp'):
