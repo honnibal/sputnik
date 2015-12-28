@@ -64,8 +64,7 @@ elif install_mode == 'test':
         old = os.getcwd()
         os.chdir('tmp')
 
-        x('python -m spacy.en.download')
-        x('python -m pytest ../spacy/ -x --models --vectors --slow')
+        x('python -m pytest ../sputnik/')
 
     finally:
         os.chdir(old)
