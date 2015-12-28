@@ -18,10 +18,11 @@ class NotFoundException(Exception): pass
 class NotIncludedException(Exception): pass
 
 
-def get_path(*path_parts):
+def get_path(*path_parts, **kwargs):
+    sep = kwargs.pop('sep', os.path.sep)
     if any([p for p in path_parts if '/' in p or '\\' in p]):
         raise InvalidPathPartsException('avoid / and \\ in path parts: %s' % path_parts)
-    return os.path.join(*path_parts)
+    return sep.join(path_parts)
 
 
 class Package(PackageStub):  # installed package
@@ -34,7 +35,7 @@ class Package(PackageStub):  # installed package
         super(Package, self).__init__(**kwargs)
 
     def has_file(self, *path_parts):
-        path = get_path(*path_parts)
+        path = get_path(*path_parts, sep='/')
         return any([m for m in self.manifest if m['path'] == path])
 
     def file_path(self, *path_parts, **kwargs):
