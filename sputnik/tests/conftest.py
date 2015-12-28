@@ -54,3 +54,14 @@ def command(tmp_path):
     return s.command(
         data_path=tmp_path,
         repository_url=os.environ.get('REPOSITORY_URL', 'https://index-staging.spacy.io'))
+
+
+def pytest_addoption(parser):
+    parser.addoption("--remote", action="store_true",
+        help="include tests that require internet connectivity")
+
+
+def pytest_runtest_setup(item):
+    for opt in ['remote']:
+        if opt in item.keywords and not item.config.getoption("--%s" % opt):
+            pytest.skip("need --%s option to run" % opt)
